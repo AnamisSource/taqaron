@@ -1,0 +1,2617 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>بازی تقارن؛ ماجراجویی نگهبانان</title>
+<style>
+:root{--bg1:#e8f6ff;--bg2:#fdf3e7;--ink:#1f3a4d;--ink2:#4a6572;--blue:#2e8bc0;--blue-d:#1a5e8a;--teal:#37b3a4;--sun:#ffb703;--pink:#f26d9c;--purple:#8d6cc9;--green:#4caf7d;--red:#e35b6d;--card:#fff;--shadow:0 6px 18px rgba(31,58,77,.12);--radius:18px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:linear-gradient(145deg,#e7f8ff 0%,#f3eaff 48%,#fff4df 100%);color:var(--ink);line-height:1.8;overflow-x:hidden;padding-bottom:24px}
+h1,h2,h3,h4{margin:0 0 8px;line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+.hidden{display:none !important}
+.app{max-width:1000px;margin:0 auto;padding:12px;position:relative;z-index:2}
+.topbar{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--card);border-radius:var(--radius);padding:8px 14px;box-shadow:var(--shadow);margin-bottom:14px;flex-wrap:wrap}
+.brand{font-weight:800;color:var(--blue-d);font-size:1.05rem;display:flex;gap:8px;align-items:center}
+.stars{display:flex;gap:4px;align-items:center;font-weight:800;color:#b8860b}
+.star-ico{color:var(--sun);font-size:1.2rem}
+.progress-dots{display:flex;gap:6px;flex-wrap:wrap}
+.pdot{width:26px;height:26px;border-radius:50%;background:#dbe9f2;display:grid;place-items:center;font-size:.75rem;font-weight:800;color:#5f7d8c;border:2px solid transparent}
+.pdot.active{border-color:var(--blue);background:#cfe9f8;color:var(--blue-d)}
+.pdot.done{background:var(--green);color:#fff}
+.card{background:rgba(255,255,255,.88);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);border-radius:var(--radius);padding:18px;box-shadow:0 8px 24px rgba(31,58,77,.13);margin-bottom:14px;border:1px solid rgba(255,255,255,.9)}
+.btn{border:none;border-radius:14px;padding:12px 18px;font-size:1rem;font-weight:800;background:var(--blue);color:#fff;box-shadow:0 4px 0 var(--blue-d);min-height:48px;transition:transform .08s}
+.btn:active{transform:translateY(2px)}
+.btn.alt{background:var(--teal);box-shadow:0 4px 0 #277e73}
+.btn.sun{background:var(--sun);color:#5a3d00;box-shadow:0 4px 0 #c98e00}
+.btn.pink{background:var(--pink);box-shadow:0 4px 0 #c14a76}
+.btn.ghost{background:#eef5fa;color:var(--blue-d);box-shadow:0 4px 0 #d3e2ec}
+.btn.danger{background:var(--red);box-shadow:0 4px 0 #a83c4b}
+.btn.big{padding:16px 28px;font-size:1.15rem;border-radius:18px}
+.btn:disabled{opacity:.5;box-shadow:none;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.center{text-align:center}
+.muted{color:var(--ink2);font-size:.95rem}
+.small{font-size:.85rem}
+.feedback{padding:12px 16px;border-radius:12px;font-weight:700;margin-top:12px}
+.feedback.ok{background:#e2f6ec;color:#1e7a4d;border:1px solid #a9dfc4}
+.feedback.bad{background:#fde3e6;color:#a83c4b;border:1px solid #f4b3bd}
+.feedback.info{background:#e6f0fb;color:#1a5e8a;border:1px solid #b4d5ee}
+
+/* ========== Three.js real 3D background ========== */
+#three-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:radial-gradient(ellipse at 12% 18%,rgba(115,225,230,.62),transparent 32%),radial-gradient(ellipse at 88% 20%,rgba(255,177,213,.58),transparent 34%),radial-gradient(ellipse at 50% 88%,rgba(255,225,137,.48),transparent 38%),linear-gradient(135deg,#e4f8ff 0%,#f2e9ff 52%,#fff2df 100%)}
+#three-bg canvas{display:block;width:100%;height:100%;pointer-events:none}
+#three-bg-fallback{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,#78d1ff 0%,#c6efff 54%,#a7e8b1 100%);overflow:hidden}
+#three-bg-fallback .bubble{display:none}
+#three-bg-fallback .fb-box{display:none}
+@keyframes floatBubble{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.1)}}
+@keyframes spinBox{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+
+/* ========== Hearts ========== */
+.lives-bar{display:flex;gap:4px;align-items:center}
+.heart{font-size:1.35rem;line-height:1;transition:transform .25s,opacity .25s;filter:drop-shadow(0 2px 3px rgba(227,91,109,.4))}
+.heart.lost{opacity:.25;filter:grayscale(1) drop-shadow(none);transform:scale(.85)}
+.heart.pulse{animation:heartPulse .4s ease}
+@keyframes heartPulse{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+/* ========== Homepage ========== */
+#screen-home{position:relative;overflow:hidden;border-radius:var(--radius)}
+#screen-home>.card{position:relative;z-index:1;background:rgba(255,255,255,.78);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,.88);box-shadow:0 18px 45px rgba(67,111,160,.17)}
+.home-simple{max-width:460px;margin:0 auto;text-align:center;padding:30px 8px}
+.home-simple h1{font-size:clamp(1.6rem,5vw,2.2rem);color:var(--blue-d);font-weight:900;line-height:1.6;margin-bottom:6px;text-shadow:0 2px 6px rgba(46,139,192,.15)}
+.home-simple .sub{font-size:.95rem;color:var(--ink2);font-weight:700;margin-bottom:20px}
+.home-simple .field{text-align:right;margin-bottom:18px}
+.home-simple .field label{display:block;font-weight:800;margin-bottom:6px;color:var(--blue-d);font-size:1rem}
+.home-simple .field input{width:100%;padding:14px 16px;border-radius:14px;border:2.5px solid #b9d9ec;font-size:1.08rem;font-family:inherit;background:#fff;color:var(--ink);box-shadow:inset 0 1px 2px rgba(0,0,0,.04)}
+.home-simple .field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(46,139,192,.15)}
+.home-simple .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.home-simple .footer-note{font-size:.78rem;color:var(--ink2);margin-top:18px;opacity:.7}
+
+/* ========== Lesson & stages ========== */
+.lesson-section{border-top:2px dashed #e1eef7;padding-top:14px;margin-top:14px}
+.lesson-section:first-child{border-top:none;margin-top:0}
+.svg-demo{max-width:320px;width:100%;height:auto;display:block;margin:8px auto}
+.opt-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.opt{padding:14px;border-radius:14px;border:2px solid #d5e6f0;background:#fbfdff;font-weight:800;font-size:1rem;color:var(--ink);min-height:52px}
+.opt.good{border-color:var(--green);background:#e2f6ec;color:#1e7a4d}
+.opt.bad{border-color:var(--red);background:#fde3e6;color:#a83c4b}
+.sym-axis{stroke:#e35b6d;stroke-width:2.5;stroke-dasharray:7 6}
+.sym-axis-2{stroke:var(--purple);stroke-width:2.5;stroke-dasharray:7 6}
+.s1-gallery{display:grid;grid-template-columns:1fr;gap:14px;margin-top:12px}
+@media(min-width:560px){.s1-gallery{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){.s1-gallery{grid-template-columns:1fr 1fr 1fr}}
+.s1-card{background:#f4faff;border:2px solid #cfe3f0;border-radius:16px;padding:12px;text-align:center;transition:transform .12s,box-shadow .12s;cursor:pointer}
+.s1-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(46,139,192,.18);border-color:var(--blue)}
+.s1-card.done{border-color:var(--green);background:#effaf4}
+.s1-card .thumb{width:100%;aspect-ratio:1/1;max-width:200px;margin:0 auto;display:block;background:#fff;border-radius:12px;border:1px solid #e1eef7}
+.s1-card .title{font-weight:800;color:var(--blue-d);margin-top:8px;font-size:1rem}
+.s1-card .status{font-size:.85rem;color:var(--ink2);font-weight:700}
+.s1-card.done .status{color:#1e7a4d}
+.s1-room{position:relative;width:100%;max-width:520px;margin:12px auto;aspect-ratio:1/1;background:#f4faff;border:2px solid #cfe3f0;border-radius:16px;overflow:hidden;touch-action:none;user-select:none}
+.s1-whole{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.s1-whole svg{width:100%;height:100%;display:block}
+.s1-half{position:absolute;top:0;left:0;height:100%;cursor:grab;touch-action:none;pointer-events:auto;z-index:3}
+.s1-half:active{cursor:grabbing}
+.s1-half svg{width:100%;height:100%;display:block;pointer-events:none}
+.s1-half.locked{pointer-events:none}
+.s1-half.moving{z-index:7;filter:drop-shadow(0 8px 16px rgba(46,139,192,.5))}
+.s1-half.fixed{z-index:2;cursor:default;pointer-events:none}
+.room-axis{position:absolute;top:0;bottom:0;left:50%;width:0;border-left:2px dashed #e35b6d;z-index:5;pointer-events:none;opacity:0;transition:opacity .3s}
+.room-axis.visible{opacity:1}
+.room-cut{position:absolute;top:0;bottom:0;width:30px;margin-left:-15px;left:50%;cursor:default;z-index:8;pointer-events:none}
+.room-cut::after{content:"✂️";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#e35b6d;color:#fff;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:1rem;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.room-cut.hidden{display:none}
+.room-label{position:absolute;top:8px;right:8px;background:#1f3a4d;color:#fff;font-size:.75rem;font-weight:800;padding:4px 10px;border-radius:20px;z-index:10;pointer-events:none;max-width:70%}
+.draw-wrap{position:relative;width:100%;max-width:520px;margin:10px auto;aspect-ratio:1/1;border:2px solid #cfe3f0;border-radius:16px;overflow:hidden;background:#fbfdff;touch-action:none}
+.draw-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;z-index:2}
+.draw-axis{position:absolute;top:0;bottom:0;left:50%;border-left:2px dashed #e35b6d;pointer-events:none;z-index:3}
+.draw-ghost{position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.85}
+.tool-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+.tool-btn{padding:8px 12px;border-radius:10px;border:2px solid #d5e6f0;background:#fff;font-weight:800;color:var(--blue-d);font-size:.9rem;min-height:40px}
+.tool-btn.sel{background:#cfe9f8;border-color:var(--blue);color:var(--blue-d)}
+.tool-btn.pen-tool.sel{background:var(--blue);color:#fff}
+.tool-btn.eraser-tool.sel{background:var(--pink);color:#fff;border-color:var(--pink)}
+.mission-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.mtab{padding:8px 12px;border-radius:10px;border:2px solid #d5e6f0;background:#fbfdff;font-weight:800;color:var(--blue-d);min-width:42px}
+.mtab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.mtab.done{border-color:var(--green);background:#e2f6ec}
+.grid-board{display:grid;gap:2px;background:#cfe3f0;padding:2px;border-radius:10px;margin:10px auto;touch-action:manipulation;position:relative}
+.cell{background:#fbfdff;border-radius:3px;aspect-ratio:1/1;position:relative;cursor:pointer;transition:background .1s;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cell:hover{filter:brightness(1.06)}
+.cell.fixed{cursor:not-allowed;opacity:.95}
+.cell.fixed::after{content:"";position:absolute;inset:0;border:1px dashed rgba(31,58,77,.18);border-radius:3px;pointer-events:none}
+.cell.wrong{box-shadow:inset 0 0 0 3px var(--red);animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.palette{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.pal{width:38px;height:38px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.pal.sel{outline:3px solid var(--blue);transform:scale(1.08)}
+.grid-axis-v{position:absolute;top:0;bottom:0;border-left:2px dashed #e35b6d;pointer-events:none;z-index:3;left:50%}
+.grid-axis-h{position:absolute;left:0;right:0;border-top:2px dashed #e35b6d;pointer-events:none;z-index:3;top:50%}
+.count-scene{width:100%;max-width:520px;margin:10px auto;border:2px solid #cfe3f0;border-radius:16px;background:#fbfdff;overflow:hidden}
+.count-scene svg{display:block;width:100%;height:auto}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:420px;margin:10px auto}
+.ans{padding:16px;border-radius:14px;border:2px solid #d5e6f0;background:#fbfdff;font-weight:900;font-size:1.2rem;color:var(--ink)}
+.ans.good{border-color:var(--green);background:#e2f6ec;color:#1e7a4d}
+.ans.bad{border-color:var(--red);background:#fde3e6;color:#a83c4b}
+.room3d-wrap{position:relative;width:100%;max-width:560px;margin:10px auto;aspect-ratio:1/1;border:2px solid #cfe3f0;border-radius:16px;overflow:hidden;background:#f0f7fb;touch-action:none}
+#s6PenCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:9;touch-action:none;cursor:crosshair}
+#s6PenCanvas.disabled{pointer-events:none;cursor:default}
+.piece3d{position:absolute;top:0;left:0;cursor:grab;touch-action:none;pointer-events:auto;z-index:3}
+.piece3d:active{cursor:grabbing}
+.piece3d svg{width:100%;height:100%;display:block;pointer-events:none;filter:drop-shadow(0 4px 8px rgba(46,139,192,.3))}
+.piece3d.moving{z-index:7}
+.cutline{position:absolute;top:0;bottom:0;border-left:3px dashed #4caf7d;cursor:ew-resize;z-index:8;pointer-events:auto;width:0;margin-left:0;box-sizing:border-box}
+.cutline::after{content:"↔";position:absolute;top:50%;left:0;transform:translate(-50%,-50%);background:#4caf7d;color:#fff;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:1rem;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.cutline.locked{border-left-style:solid;border-left-color:#4caf7d;cursor:default;pointer-events:none}
+.cutline.hidden{display:none}
+.report-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:8px;overflow-x:auto;display:block}
+.report-table table{border-collapse:collapse;width:100%}
+.report-table th,.report-table td{border:1px solid #d5e6f0;padding:6px;text-align:center}
+.report-table th{background:#eef7fd;color:var(--blue-d);font-weight:800}
+.skill-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:10px;background:#f4faff;margin-bottom:6px;gap:8px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-weight:800;font-size:.82rem}
+.badge.good{background:#e2f6ec;color:#1e7a4d}
+.badge.mid{background:#fff4d6;color:#8a6a00}
+.badge.low{background:#fde3e6;color:#a83c4b}
+.badge.na{background:#eaeef1;color:#647282}
+.score-big{font-size:2.4rem;font-weight:900;color:var(--blue-d);text-align:center}
+.modal-back{position:fixed;inset:0;background:rgba(20,40,55,.55);display:grid;place-items:center;z-index:100;padding:14px}
+.modal{background:#fff;border-radius:var(--radius);padding:20px;max-width:520px;width:100%;max-height:85vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#1f3a4d;color:#fff;padding:10px 18px;border-radius:12px;font-weight:700;z-index:200;box-shadow:var(--shadow);opacity:0;transition:opacity .25s;pointer-events:none;max-width:92vw;text-align:center}
+.toast.show{opacity:1}
+@media print{body{background:#fff !important}.topbar,.no-print,.btn,#three-bg,#three-bg-fallback{display:none !important}.card{box-shadow:none;border:1px solid #999;page-break-inside:avoid}}
+
+.star-rain{position:fixed;inset:0;z-index:99999;pointer-events:none;overflow:hidden}
+.star-rain .fall-star{position:absolute;top:-12vh;left:var(--x);font-size:var(--size);color:var(--color);text-shadow:0 2px 5px #fff9;opacity:0;animation:starFall var(--dur) cubic-bezier(.2,.65,.35,1) var(--delay) forwards;will-change:transform,opacity}
+@keyframes starFall{0%{transform:translate3d(0,-8vh,0) rotate(0deg) scale(.45);opacity:0}10%{opacity:1}85%{opacity:1}100%{transform:translate3d(var(--drift),115vh,0) rotate(var(--spin)) scale(1.1);opacity:0}}
+@media(prefers-reduced-motion:reduce){.star-rain .fall-star{animation-duration:.7s}}
+
+.audio-controls{display:flex;gap:6px;align-items:center}
+.snd-btn{width:36px;height:36px;border-radius:50%;border:2px solid #cfe3f0;background:#fbfdff;font-size:1.1rem;display:grid;place-items:center;padding:0}
+.snd-btn.on{background:#cfe9f8;border-color:var(--blue)}
+
+.screen-fade{animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.heart-loss-modal{text-align:center}
+.heart-loss-modal .big-hearts{font-size:2rem;letter-spacing:6px;margin:12px 0}
+
+/* ========== Transparent glass UI: keep the Three.js world fully visible ========== */
+.topbar{
+  background:rgba(255,255,255,.12)!important;
+  border:1px solid rgba(255,255,255,.34);
+  backdrop-filter:blur(2px) saturate(135%);
+  -webkit-backdrop-filter:blur(2px) saturate(135%);
+  box-shadow:0 8px 24px rgba(15,55,90,.10);
+}
+.card{
+  background:rgba(255,255,255,.10)!important;
+  border:1px solid rgba(255,255,255,.34)!important;
+  backdrop-filter:blur(1.5px) saturate(130%)!important;
+  -webkit-backdrop-filter:blur(1.5px) saturate(130%)!important;
+  box-shadow:0 8px 24px rgba(15,55,90,.10)!important;
+}
+#screen-home>.card{
+  background:rgba(255,255,255,.13)!important;
+  border-color:rgba(255,255,255,.40)!important;
+  backdrop-filter:blur(2px) saturate(135%)!important;
+  -webkit-backdrop-filter:blur(2px) saturate(135%)!important;
+}
+.lesson-section{border-top-color:rgba(255,255,255,.38)}
+.opt,.ans,.s1-card,.mtab,.tool-btn{
+  background:rgba(255,255,255,.13)!important;
+  border-color:rgba(255,255,255,.48)!important;
+  backdrop-filter:blur(1px);
+  -webkit-backdrop-filter:blur(1px);
+  box-shadow:0 4px 14px rgba(15,55,90,.08);
+}
+.opt.good,.ans.good,.s1-card.done,.mtab.done{background:rgba(120,235,170,.28)!important;border-color:rgba(55,160,105,.65)!important}
+.opt.bad,.ans.bad{background:rgba(255,135,155,.30)!important;border-color:rgba(210,65,90,.65)!important}
+.opt-row,.answers{background:transparent!important}
+.s1-room,.draw-wrap,.grid-board,.count-scene,.room3d-wrap{
+  background:rgba(255,255,255,.08)!important;
+  border-color:rgba(255,255,255,.42)!important;
+  box-shadow:0 8px 22px rgba(15,55,90,.08);
+  backdrop-filter:blur(.5px);
+  -webkit-backdrop-filter:blur(.5px);
+}
+.s1-card .thumb,.cell,.grid-board .cell{
+  background:rgba(255,255,255,.10)!important;
+}
+.room-label{background:rgba(20,48,68,.78)!important;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+/* Keep question text readable without covering the scenery with a white slab. */
+.card h1,.card h2,.card h3,.card p,.card label,.card .muted,.opt,.ans,.s1-card .title,.s1-card .status{
+  text-shadow:0 1px 2px rgba(255,255,255,.20);
+}
+
+</style>
+</head>
+<body>
+<div id="three-bg" aria-hidden="true"></div>
+<div id="three-bg-fallback" class="hidden" aria-hidden="true"></div>
+
+<div class="app">
+  <div class="topbar no-print hidden" id="topbar">
+    <div class="brand"><span>🏝️</span><span>نگهبانان تقارن</span></div>
+    <div class="progress-dots" id="progressDots"></div>
+    <div class="lives-bar" id="livesBar" title="جان‌های باقی‌مانده">
+      <span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span>
+      <span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span>
+    </div>
+    <div class="stars"><span class="star-ico">★</span><span id="starCount">0</span></div>
+    <div class="audio-controls">
+      <button class="snd-btn on" id="btnMusic" title="موسیقی">🎵</button>
+      <button class="snd-btn on" id="btnSfx" title="صداها">🔊</button>
+    </div>
+  </div>
+
+  <section id="screen-home">
+    <div class="card">
+      <div class="home-simple">
+        <h1>✨ بازی تقارن ✨</h1>
+        <div class="sub">ماجراجویی نگهبانان تقارن</div>
+        <div class="field">
+          <label for="inpFirst">نام زیبایت را بنویس</label>
+          <input id="inpFirst" type="text" autocomplete="off" placeholder="مثلاً سارا" maxlength="30">
+        </div>
+        <div id="homeFeedback" class="feedback hidden"></div>
+        <div class="actions">
+          <button class="btn big sun" id="btnStart">🚀 شروع ماجراجویی</button>
+        </div>
+        <div class="footer-note">فاطمه جاشونیا</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-lesson" class="hidden">
+    <div class="card">
+      <h2 style="color:var(--blue-d)">📚 درسنامه تصویری: راز تقارن</h2>
+      <div class="lesson-section">
+        <h3>الف) مفهوم تقارن</h3>
+        <p>اگر بتوانیم شکلی را از روی یک خط تا کنیم و دو قسمت آن روی هم بیفتند، آن خط، <b>خط تقارن</b> است.</p>
+        <svg class="svg-demo" viewBox="0 0 260 160">
+          <line x1="130" y1="8" x2="130" y2="152" class="sym-axis"/>
+          <path d="M130 60 C100 20 60 60 130 85 C200 60 160 20 130 60Z" fill="#f26d9c"/>
+          <path d="M130 85 C105 105 85 130 130 125 C175 130 155 105 130 85Z" fill="#f9b3cc"/>
+        </svg>
+      </div>
+      <div class="lesson-section">
+        <h3>ب) شکل‌های متقارن</h3>
+        <div class="center" id="symDemoWrap"></div>
+        <div class="opt-row">
+          <button class="opt" data-sym="yes">✅ متقارن</button>
+          <button class="opt" data-sym="no">❌ نامتقارن</button>
+        </div>
+        <div id="symFeedback" class="feedback hidden"></div>
+      </div>
+      <div class="lesson-section">
+        <h3>ج) تقارن دوقسمتی</h3>
+        <svg class="svg-demo" viewBox="0 0 260 160">
+          <line x1="130" y1="8" x2="130" y2="152" class="sym-axis"/>
+          <rect x="70" y="40" width="55" height="80" fill="#2e8bc0" opacity=".8"/>
+          <rect x="135" y="40" width="55" height="80" fill="#2e8bc0" opacity=".4"/>
+        </svg>
+      </div>
+      <div class="lesson-section">
+        <h3>د) تقارن چهارقسمتی</h3>
+        <svg class="svg-demo" viewBox="0 0 260 260">
+          <rect x="20" y="20" width="220" height="220" fill="#fbfdff" stroke="#cfe3f0" stroke-width="2"/>
+          <line x1="130" y1="20" x2="130" y2="240" class="sym-axis"/>
+          <line x1="20" y1="130" x2="240" y2="130" class="sym-axis-2"/>
+          <circle cx="70" cy="70" r="14" fill="#f26d9c"/><circle cx="190" cy="70" r="14" fill="#f26d9c"/>
+          <circle cx="70" cy="190" r="14" fill="#f26d9c"/><circle cx="190" cy="190" r="14" fill="#f26d9c"/>
+        </svg>
+      </div>
+      <div class="lesson-section">
+        <h3>هـ) تمرین</h3>
+        <div class="card" style="background:#f7fcff"><h4>تمرین ۱: کدام خط تقارن؟</h4><div class="opt-row" id="ex1"></div></div>
+        <div class="card" style="background:#f7fcff"><h4>تمرین ۲: کدام شکل متقارن؟</h4><div class="opt-row" id="ex2"></div></div>
+        <div class="card" style="background:#f7fcff"><h4>تمرین ۳: الگو را کامل کن</h4>
+          <svg viewBox="0 0 260 120" style="width:100%;max-width:320px;display:block;margin:8px auto">
+            <line x1="130" y1="6" x2="130" y2="114" class="sym-axis"/>
+            <circle cx="70" cy="60" r="16" fill="#2e8bc0"/><circle cx="100" cy="60" r="16" fill="#ffb703"/>
+            <rect x="40" y="40" width="20" height="40" fill="#4caf7d"/>
+            <rect x="110" y="40" width="20" height="40" fill="#4caf7d" opacity=".35"/>
+          </svg>
+          <div class="opt-row" id="ex3"></div>
+        </div>
+        <div id="lessonFeedback" class="feedback hidden"></div>
+        <div class="row" style="justify-content:center;margin-top:12px">
+          <button class="btn big" id="btnEnterMission" disabled>ورود به مأموریت‌ها ➜</button>
+        </div>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:14px">
+        <button class="btn ghost" id="btnBackHomeFromLesson">🏠 بازگشت</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-s1" class="hidden">
+    <div class="card">
+      <h2 style="color:var(--blue-d)">🦋 آزمایشگاه آینه‌های جادویی</h2>
+      <p class="muted">یک شکل انتخاب کن، برش بزن، دو نیمه را جدا کن و دوباره وصل کن.</p>
+      <div id="s1GalleryView"><div class="s1-gallery" id="s1Gallery"></div></div>
+      <div id="s1RoomView" class="hidden">
+        <div class="row" style="justify-content:space-between;margin-bottom:8px">
+          <button class="btn ghost" id="s1Back">← گالری</button>
+          <span class="badge mid" id="s1RoomTitle">شکل</span>
+        </div>
+        <div class="s1-room" id="s1Room">
+          <div class="room-axis" id="s1RoomAxis"></div>
+          <div class="room-cut" id="s1RoomCut"></div>
+          <div class="room-label" id="s1RoomLabel">مرحله ۱: برش را روی خط تقارن تنظیم کن</div>
+        </div>
+        <div class="row" style="justify-content:center;margin-top:10px;flex-wrap:wrap">
+          <button class="btn pink" id="s1CutBtn">✂️ برش بزن</button>
+          <button class="btn ghost" id="s1Reset">↺ بازنشانی</button>
+          <button class="btn alt" id="s1CheckRoom">✔ اتصال درست است</button>
+        </div>
+        <div id="s1RoomFeedback" class="feedback hidden"></div>
+        <p class="center small muted" style="margin-top:8px" id="s1RoomHint"></p>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:14px">
+        <button class="btn" id="s1Next" disabled>مرحله بعد ➜</button>
+      </div>
+      <div id="s1Feedback" class="feedback hidden"></div>
+    </div>
+  </section>
+
+  <section id="screen-s2" class="hidden">
+    <div class="card">
+      <h2 style="color:var(--blue-d)">✏️ نیمه گمشده را کامل کن</h2>
+      <p class="muted small center">نیمه‌ی رنگی شکل را در سمت چپ ببین و نیمه‌ی قرینه‌ی آن را در سمت راست با قلم بکش. رنگ نیمه‌ی خودت را از پالت انتخاب کن. خط قرمز، محور تقارن است.</p>
+      <div class="mission-tabs" id="s2Tabs"></div>
+      <div class="draw-wrap" id="s2Wrap">
+        <div class="draw-ghost" id="s2Ghost"></div>
+        <canvas id="s2Canvas"></canvas>
+        <div class="draw-axis"></div>
+      </div>
+      <div class="tool-row" style="margin-top:8px">
+        <button class="tool-btn pen-tool sel" data-tool="pen" id="s2Pen">✏️ قلم</button>
+        <button class="tool-btn eraser-tool" data-tool="eraser" id="s2Eraser">🧽 پاکن</button>
+        <button class="tool-btn" data-size="3">نازک</button>
+        <button class="tool-btn sel" data-size="6">متوسط</button>
+        <button class="tool-btn" data-size="10">ضخیم</button>
+        <button class="tool-btn" id="s2Undo">↶</button>
+        <button class="tool-btn" id="s2Clear">🗑</button>
+      </div>
+      <div class="palette" id="s2Palette" style="margin-top:6px"></div>
+      <div class="row" style="justify-content:center;margin-top:10px">
+        <button class="btn ghost" id="s2Hint">راهنما</button>
+        <button class="btn alt" id="s2Check">✔ بررسی</button>
+        <button class="btn" id="s2Next" disabled>پس از تکمیل همه سطح‌ها ➜</button>
+      </div>
+      <div id="s2Feedback" class="feedback hidden"></div>
+    </div>
+  </section>
+
+  <section id="screen-s3" class="hidden">
+    <div class="card">
+      <h2 style="color:var(--blue-d)">🎨 نقاش آینه‌ای</h2>
+      <div class="mission-tabs" id="s3Tabs"></div>
+      <div class="row" style="justify-content:center;gap:8px;margin-bottom:8px">
+        <button class="btn ghost" id="s3HelpBtn">🧭 راهنما: خاموش</button>
+        <button class="btn ghost" id="s3Clear">🗑 پاک کردن</button>
+      </div>
+      <div id="s3BoardWrap" style="position:relative"></div>
+      <div class="palette" id="s3Palette"></div>
+      <div class="row" style="justify-content:center;margin-top:8px">
+        <button class="btn ghost" id="s3Hint">راهنما</button>
+        <button class="btn alt" id="s3Check">✔ بررسی</button>
+        <button class="btn" id="s3Next" disabled>پس از تکمیل همه سطح‌ها ➜</button>
+      </div>
+      <div id="s3Feedback" class="feedback hidden"></div>
+    </div>
+  </section>
+
+  <section id="screen-s4" class="hidden">
+    <div class="card">
+      <h2 style="color:var(--blue-d)">🧶 فرش چهارقسمتی</h2>
+      <div class="mission-tabs" id="s4Tabs"></div>
+      <div class="row" style="justify-content:center;gap:8px;margin-bottom:8px">
+        <button class="btn ghost" id="s4HelpBtn">🧭 راهنما: خاموش</button>
+        <button class="btn ghost" id="s4Clear">🗑 پاک کردن</button>
+      </div>
+      <div id="s4BoardWrap" style="position:relative"></div>
+      <div class="palette" id="s4Palette"></div>
+      <div class="row" style="justify-content:center;margin-top:8px">
+        <button class="btn ghost" id="s4Hint">راهنما</button>
+        <button class="btn alt" id="s4Check">✔ بررسی</button>
+        <button class="btn" id="s4Next" disabled>پس از تکمیل ۴ سطح ➜</button>
+      </div>
+      <div id="s4Feedback" class="feedback hidden"></div>
+    </div>
+  </section>
+
+  <section id="screen-s5" class="hidden">
+    <div class="card">
+      <h2 style="color:var(--blue-d)">🔍 کارآگاه شمارش</h2>
+      <div id="s5Question" class="card" style="background:#f7fcff;font-weight:800;font-size:1.02rem"></div>
+      <div class="count-scene" id="s5Scene"></div>
+      <div class="answers" id="s5Answers"></div>
+      <div id="s5Feedback" class="feedback hidden"></div>
+      <div class="row" style="justify-content:center;margin-top:10px">
+        <button class="btn ghost" id="s5Hint">راهنما</button>
+        <button class="btn" id="s5Next" disabled>سؤال بعد ➜</button>
+      </div>
+      <p class="center muted small" id="s5Counter"></p>
+    </div>
+  </section>
+
+  <section id="screen-s6" class="hidden">
+    <div class="card">
+      <h2 style="color:var(--blue-d)">🧊 کارگاه سه‌بعدی</h2>
+      <div class="mission-tabs" id="s6Tabs"></div>
+      <p class="muted small center">۱) قلم را بردار و خط تقارن شکل را بکش. ۲) خط را بررسی کن. ۳) سپس خط سبزِ برش را روی همان خط تنظیم کن.</p>
+      <div class="room3d-wrap" id="s6Room">
+        <div class="cutline" id="s6Cut" style="left:50%"></div>
+        <canvas id="s6PenCanvas" aria-label="بوم رسم خط تقارن"></canvas>
+      </div>
+      <div class="tool-row" style="justify-content:center;margin-top:8px">
+        <button class="tool-btn pen-tool sel" id="s6Pen">✏️ قلم</button>
+        <button class="tool-btn" id="s6ClearLine">🗑 پاک‌کردن خط</button>
+        <button class="btn alt" id="s6CheckLine">✔ بررسی خط تقارن</button>
+      </div>
+      <div class="feedback info small" id="s6Hint">💡 با قلم یک خط تقریباً عمودی از بالا تا پایینِ وسط شکل بکش. پس از تأیید، خط سبز مبنای دقیق برش خواهد بود.</div>
+      <div class="row" style="justify-content:center;margin-top:10px;flex-wrap:wrap">
+        <button class="btn pink" id="s6Split" disabled>✂️ برش</button>
+        <button class="btn alt" id="s6Check">✔ بررسی اتصال</button>
+        <button class="btn" id="s6Next" disabled>پایان ➜</button>
+      </div>
+      <div id="s6Feedback" class="feedback hidden"></div>
+    </div>
+  </section>
+
+  <section id="screen-report" class="hidden">
+    <div class="card" id="reportCard">
+      <h2 style="color:var(--blue-d);text-align:center">🏆 کارنامه یادگیری</h2>
+      <div id="reportContent"></div>
+    </div>
+    <div class="row no-print" style="justify-content:center;flex-wrap:wrap">
+      <button class="btn sun" id="btnPrint">🖨 چاپ</button>
+      <button class="btn alt" id="btnPdf">📄 PDF</button>
+      <button class="btn ghost" id="btnShowAnswers">👁 پاسخ‌ها</button>
+      <button class="btn danger" id="btnRestart">🔄 شروع دوباره</button>
+      <button class="btn" id="btnHomeFromReport">🏠 خانه</button>
+    </div>
+  </section>
+</div>
+
+<div id="modalBack" class="modal-back hidden"><div class="modal" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+
+/* ============================================================
+   REAL THREE.JS 3D BACKGROUND ENGINE
+   ============================================================ */
+const BG = (function(){
+  let renderer, scene, camera, animId = null;
+  let clock = null;
+  let activeStage = 'home';
+  let running = true;
+  let container = null;
+  let disposables = [];
+  let currentStageObjects = [];
+  let isMobile = window.innerWidth < 768;
+
+  const PALETTE = [0x8d6cc9, 0xf26d9c, 0x37b3a4, 0xffb703, 0x2e8bc0, 0x4caf7d, 0xffe28a, 0xff7b00, 0x9be8d8, 0xffb4d1];
+
+  function init(){
+    container = document.getElementById('three-bg');
+    if(!container) return false;
+    if(typeof THREE === 'undefined'){
+      showFallback();
+      return false;
+    }
+    try{
+      renderer = new THREE.WebGLRenderer({antialias: !isMobile, alpha: true, powerPreference: 'high-performance'});
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2));
+      renderer.setClearColor(0x000000, 0);
+      renderer.shadowMap.enabled = false; // keep performance; we use light direction only
+      container.appendChild(renderer.domElement);
+
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 300);
+      camera.position.set(0, 0, 22);
+      clock = new THREE.Clock();
+
+      window.addEventListener('resize', onResize);
+      document.addEventListener('visibilitychange', onVisibility);
+
+      buildScene('home');
+      animate();
+      return true;
+    }catch(e){
+      console.error('Three.js init failed:', e);
+      showFallback();
+      return false;
+    }
+  }
+
+  function showFallback(){
+    if(container) container.style.display = 'none';
+    const fb = document.getElementById('three-bg-fallback');
+    if(!fb) return;
+    fb.classList.remove('hidden');
+    if(fb.children.length > 0) return;
+    for(let i=0;i<12;i++){
+      const b = document.createElement('div');
+      b.className = 'bubble';
+      const size = 40 + Math.random()*120;
+      b.style.width = size+'px'; b.style.height = size+'px';
+      b.style.left = (Math.random()*100)+'%';
+      b.style.top = (Math.random()*100)+'%';
+      b.style.animationDelay = (Math.random()*8)+'s';
+      b.style.background = 'radial-gradient(circle at 30% 30%,#fff,' + ['#8d6cc9','#f26d9c','#37b3a4','#ffb703','#2e8bc0'][i%5] + ')';
+      fb.appendChild(b);
+    }
+    for(let i=0;i<6;i++){
+      const b = document.createElement('div');
+      b.className = 'fb-box';
+      const size = 30 + Math.random()*70;
+      b.style.width = size+'px'; b.style.height = size+'px';
+      b.style.left = (Math.random()*100)+'%';
+      b.style.top = (Math.random()*100)+'%';
+      b.style.animationDelay = (Math.random()*10)+'s';
+      fb.appendChild(b);
+    }
+  }
+
+  function clearScene(){
+    if(!scene) return;
+    for(let i = scene.children.length - 1; i >= 0; i--){
+      scene.remove(scene.children[i]);
+    }
+    disposables.forEach(function(d){ try{ if(d && d.dispose) d.dispose(); }catch(e){} });
+    disposables = [];
+    currentStageObjects = [];
+  }
+
+  function addLights(){
+    const amb = new THREE.AmbientLight(0xffffff, 0.78);
+    scene.add(amb);
+    const hemi = new THREE.HemisphereLight(0xfff0f8, 0x88b8ff, 0.72);
+    scene.add(hemi);
+    const key = new THREE.DirectionalLight(0xfff4e0, 1.25);
+    key.position.set(12, 18, 14);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xd0e8ff, 0.6);
+    fill.position.set(-14, -6, 10);
+    scene.add(fill);
+    const rim = new THREE.PointLight(0xffc0e0, 0.7, 60);
+    rim.position.set(0, 8, -8);
+    scene.add(rim);
+  }
+
+  function makeMat(color, opacity, opts){
+    opts = opts || {};
+    return new THREE.MeshPhongMaterial({
+      color: color,
+      shininess: opts.shininess || 90,
+      specular: opts.specular !== undefined ? opts.specular : 0xffffff,
+      transparent: opacity !== undefined && opacity < 1,
+      opacity: opacity !== undefined ? opacity : 1,
+      flatShading: !!opts.flat,
+      side: THREE.DoubleSide
+    });
+  }
+
+  function createParticles(count, palette, opts){
+    opts = opts || {};
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(count*3);
+    const col = new Float32Array(count*3);
+    const speeds = [];
+    const tc = new THREE.Color();
+    const zMin = opts.zMin !== undefined ? opts.zMin : -20;
+    const zMax = opts.zMax !== undefined ? opts.zMax : 2;
+    for(let i=0;i<count;i++){
+      pos[i*3]   = (Math.random()-0.5)*50;
+      pos[i*3+1] = (Math.random()-0.5)*34;
+      pos[i*3+2] = zMin + Math.random()*(zMax - zMin);
+      tc.setHex(palette[Math.floor(Math.random()*palette.length)]);
+      col[i*3] = tc.r; col[i*3+1] = tc.g; col[i*3+2] = tc.b;
+      speeds.push({y: 0.008 + Math.random()*0.02, phase: Math.random()*Math.PI*2});
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+
+    const tex = (function(){
+      const c = document.createElement('canvas'); c.width=64; c.height=64;
+      const g = c.getContext('2d');
+      const grd = g.createRadialGradient(32,32,0,32,32,32);
+      grd.addColorStop(0,'rgba(255,255,255,1)');
+      grd.addColorStop(0.4,'rgba(255,255,255,0.8)');
+      grd.addColorStop(1,'rgba(255,255,255,0)');
+      g.fillStyle = grd; g.beginPath(); g.arc(32,32,32,0,Math.PI*2); g.fill();
+      return new THREE.CanvasTexture(c);
+    })();
+
+    const mat = new THREE.PointsMaterial({
+      size: opts.size || 0.5,
+      map: tex,
+      vertexColors: true,
+      transparent: true,
+      opacity: opts.opacity !== undefined ? opts.opacity : 0.85,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    const pts = new THREE.Points(geo, mat);
+    pts.userData = {speeds: speeds, count: count, baseZ: zMax};
+    scene.add(pts);
+    disposables.push(geo, mat, tex);
+    return pts;
+  }
+
+  /* ---------- SHAPE FACTORIES ---------- */
+  function makeSphere(color, r, opacity){
+    const g = new THREE.SphereGeometry(r, 24, 20);
+    const m = new THREE.Mesh(g, makeMat(color, opacity, {shininess: 100, specular: 0xffffff}));
+    disposables.push(g, m.material);
+    return m;
+  }
+  function makeRoundedBox(color, size, opacity){
+    const g = new THREE.BoxGeometry(size, size, size, 4, 4, 4);
+    // Round corners by averaging vertices slightly? Simpler: use bevel-ish via scale + rotation offset.
+    const m = new THREE.Mesh(g, makeMat(color, opacity, {shininess: 80}));
+    disposables.push(g, m.material);
+    return m;
+  }
+  function makeTorus(color, R, r, opacity){
+    const g = new THREE.TorusGeometry(R, r, 20, 60);
+    const m = new THREE.Mesh(g, makeMat(color, opacity, {shininess: 110}));
+    disposables.push(g, m.material);
+    return m;
+  }
+  function makeIcosa(color, r, opacity){
+    const g = new THREE.IcosahedronGeometry(r, 0);
+    const m = new THREE.Mesh(g, makeMat(color, opacity, {shininess: 100, flat: false}));
+    disposables.push(g, m.material);
+    return m;
+  }
+  function makeOcta(color, r, opacity){
+    const g = new THREE.OctahedronGeometry(r, 0);
+    const m = new THREE.Mesh(g, makeMat(color, opacity, {shininess: 100}));
+    disposables.push(g, m.material);
+    return m;
+  }
+  function makeDodeca(color, r, opacity){
+    const g = new THREE.DodecahedronGeometry(r, 0);
+    const m = new THREE.Mesh(g, makeMat(color, opacity, {shininess: 100}));
+    disposables.push(g, m.material);
+    return m;
+  }
+  function makeCone(color, r, h, opacity){
+    const g = new THREE.ConeGeometry(r, h, 24);
+    const m = new THREE.Mesh(g, makeMat(color, opacity, {shininess: 80}));
+    disposables.push(g, m.material);
+    return m;
+  }
+  function makeCylinder(color, r, h, opacity){
+    const g = new THREE.CylinderGeometry(r, r, h, 24);
+    const m = new THREE.Mesh(g, makeMat(color, opacity, {shininess: 80}));
+    disposables.push(g, m.material);
+    return m;
+  }
+
+  // 3D Star (extruded 2D star)
+  function makeStar(color, size, opacity){
+    const shape = new THREE.Shape();
+    const spikes = 5, outer = size, inner = size*0.45;
+    for(let i=0;i<spikes*2;i++){
+      const r = i%2===0 ? outer : inner;
+      const a = (Math.PI/spikes)*i - Math.PI/2;
+      const x = Math.cos(a)*r, y = Math.sin(a)*r;
+      if(i===0) shape.moveTo(x,y); else shape.lineTo(x,y);
+    }
+    shape.closePath();
+    const geo = new THREE.ExtrudeGeometry(shape, {depth: size*0.5, bevelEnabled: true, bevelThickness: size*0.12, bevelSize: size*0.12, bevelSegments: 3});
+    geo.center();
+    const m = new THREE.Mesh(geo, makeMat(color, opacity, {shininess: 110}));
+    disposables.push(geo, m.material);
+    return m;
+  }
+
+  // 3D Heart (two spheres + cone)
+  function makeHeart(color, size, opacity){
+    const grp = new THREE.Group();
+    const s1 = makeSphere(color, size*0.55, opacity);
+    const s2 = makeSphere(color, size*0.55, opacity);
+    s1.position.set(-size*0.35, size*0.3, 0);
+    s2.position.set(size*0.35, size*0.3, 0);
+    const cone = makeCone(color, size*0.85, size*1.1, opacity);
+    cone.position.set(0, -size*0.3, 0);
+    cone.rotation.x = Math.PI;
+    grp.add(s1, s2, cone);
+    return grp;
+  }
+
+  // 3D Butterfly (body + 4 wings as scaled spheres)
+  function makeButterfly(color, size, opacity){
+    const grp = new THREE.Group();
+    const body = makeCylinder(0x2a1a3a, size*0.12, size*1.1, opacity);
+    body.rotation.z = Math.PI/2;
+    grp.add(body);
+    const wingGeo = new THREE.SphereGeometry(size*0.55, 18, 14);
+    disposables.push(wingGeo);
+    function wing(flipX, flipY, dz){
+      const w = new THREE.Mesh(wingGeo, makeMat(color, opacity, {shininess: 100}));
+      w.scale.set(1.4, 0.9, 0.35);
+      w.position.set(flipX * size*0.7, flipY * size*0.45, dz);
+      w.rotation.z = flipX * 0.3;
+      disposables.push(w.material);
+      return w;
+    }
+    grp.add(wing(-1, 1, 0), wing(1, 1, 0), wing(-1, -1, 0.15), wing(1, -1, 0.15));
+    return grp;
+  }
+
+  // 3D Flower (central sphere + petals as flattened spheres)
+  function makeFlower(color, size, opacity){
+    const grp = new THREE.Group();
+    const center = makeSphere(0xffb703, size*0.35, opacity);
+    grp.add(center);
+    const petalGeo = new THREE.SphereGeometry(size*0.4, 14, 12);
+    disposables.push(petalGeo);
+    for(let i=0;i<6;i++){
+      const a = (Math.PI*2/6)*i;
+      const p = new THREE.Mesh(petalGeo, makeMat(color, opacity, {shininess: 80}));
+      p.scale.set(1, 0.5, 0.4);
+      p.position.set(Math.cos(a)*size*0.6, Math.sin(a)*size*0.6, 0);
+      p.rotation.z = a;
+      disposables.push(p.material);
+      grp.add(p);
+    }
+    return grp;
+  }
+
+  // 3D Diamond / gem
+  function makeDiamond(color, size, opacity){
+    const g = new THREE.OctahedronGeometry(size, 0);
+    const m = new THREE.Mesh(g, makeMat(color, opacity, {shininess: 130, flat: true}));
+    disposables.push(g, m.material);
+    return m;
+  }
+
+  /* ---------- SCENE BUILDERS PER STAGE ---------- */
+  function buildScene(stage){
+    if(!scene) return;
+    activeStage = stage;
+    clearScene();
+    addLights();
+    // A dedicated 3D fairytale landscape: scenery only. No symmetry axes,
+    // puzzle-like objects, or question-related shapes are placed in the backdrop.
+    scene.background = new THREE.Color(0x80d5ff);
+    scene.fog = new THREE.Fog(0x9bdfff, 34, 95);
+
+    function mat(color, extra){ return new THREE.MeshPhongMaterial(Object.assign({color:color, shininess:55, specular:0x8daec4}, extra||{})); }
+    function keep(mesh){ scene.add(mesh); if(mesh.geometry) disposables.push(mesh.geometry); if(mesh.material) disposables.push(mesh.material); return mesh; }
+    function ball(color,x,y,z,sx,sy,sz){
+      const m = new THREE.Mesh(new THREE.SphereGeometry(1,28,20), mat(color));
+      m.position.set(x,y,z); m.scale.set(sx,sy,sz); m.castShadow=false; m.receiveShadow=true; return keep(m);
+    }
+    function trunk(x,y,z,h,r,color){
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(r*.72,r,h,16),mat(color));
+      m.position.set(x,y+h/2,z); return keep(m);
+    }
+    function tree(x,y,z,scale){
+      trunk(x,y,z,2.4*scale,.22*scale,0x98613c);
+      ball(0x4eaf67,x,y+2.45*scale,z,1.12*scale,1.08*scale,.72*scale);
+      ball(0x76d879,x-.45*scale,y+2.9*scale,z+.05, .78*scale,.75*scale,.62*scale);
+      ball(0x319b61,x+.48*scale,y+2.35*scale,z+.12, .76*scale,.72*scale,.58*scale);
+    }
+    function cloud(x,y,z,scale){
+      ball(0xffffff,x,y,z,1.25*scale,.48*scale,.35*scale);
+      ball(0xffffff,x-.72*scale,y+.18*scale,z, .72*scale,.55*scale,.34*scale);
+      ball(0xffffff,x+.45*scale,y+.28*scale,z, .8*scale,.68*scale,.36*scale);
+    }
+    function mountain(x,y,z,rx,ry,rz,color){
+      const m=new THREE.Mesh(new THREE.ConeGeometry(1,2,7),mat(color,{flatShading:true}));
+      m.position.set(x,y,z); m.scale.set(rx,ry,rz); m.rotation.y=.22; return keep(m);
+    }
+    // Deep sky clouds and distant blue mountains.
+    cloud(-10,6,-17,1.8); cloud(-3,7.2,-20,1.25); cloud(7,6.6,-19,1.65); cloud(12,5.4,-16,1.15);
+    mountain(-10,-1.1,-18,3.1,5.2,1.5,0x8db9e5);
+    mountain(-6,-1.0,-19,2.6,4.2,1.35,0x719fd6);
+    mountain(0,-.8,-21,3.8,5.5,1.7,0x83b4df);
+    mountain(5,-1.0,-19,3.0,4.5,1.4,0x6f9fd4);
+    mountain(10,-1.0,-17,3.4,5.0,1.6,0x9bc8e9);
+    // Green rolling islands/hills form a visible horizon.
+    ball(0x58c978,-10,-4.2,-13,7,2.5,2.1);
+    ball(0x7cdb78,-2,-4.5,-14,8,2.3,2.2);
+    ball(0x4cbd70,7,-4.3,-12,8,2.7,2.3);
+    ball(0x86df7b,13,-4.5,-10,5,2.4,2.1);
+    // A calm blue lake, with layered banks, behind the gameplay cards.
+    const lake = new THREE.Mesh(new THREE.PlaneGeometry(38,12),mat(0x4ebfe9,{shininess:100,specular:0xffffff}));
+    lake.rotation.x=-Math.PI/2; lake.position.set(0,-6.25,-8); keep(lake);
+    ball(0x39aee2,0,-5.85,-8,16,.28,1.3);
+    // Foreground grass bank; kept low so it never covers the question area.
+    ball(0x35b966,-10,-8.4,-4,10,2.0,3.0);
+    ball(0x50cb69,0,-8.8,-3,12,2.1,3.2);
+    ball(0x36b65f,11,-8.4,-4,10,2.0,3.0);
+    // Framing trees and shrubs on the far sides, not in the central reading zone.
+    tree(-13,-7.3,-2,1.2); tree(-10.8,-7.5,-1,0.78);
+    tree(13,-7.3,-2,1.2); tree(10.8,-7.5,-1,0.78);
+    // Small flowers and stones at the very bottom edge as environmental detail.
+    const flowerColors=[0xff78b8,0xffd45c,0xffffff,0xb89bff];
+    for(let i=0;i<18;i++){
+      const side=i%2===0?-1:1, x=side*(6.5+Math.random()*7), y=-8.4+Math.random()*.5, z=-1+Math.random()*1.2;
+      ball(flowerColors[i%flowerColors.length],x,y,z,.12,.12,.1);
+      ball(0xffd45c,x,y+.1,z,.055,.055,.05);
+    }
+    for(let i=0;i<12;i++){
+      const x=(Math.random()-.5)*30;
+      const m=new THREE.Mesh(new THREE.SphereGeometry(.18+Math.random()*.22,12,10),mat([0xd5e4ef,0xb7d5e6,0xe8d4bc][i%3]));
+      m.position.set(x,-8.5+Math.random()*.3,-.5+Math.random()); m.scale.y=.55; keep(m);
+    }
+    // Sparse glowing motes in the sky only; not placed over the activity canvas.
+    createParticles(isMobile ? 24 : 42,[0xffffff,0xfff1a6,0xc6f7ff],{size:.22,opacity:.42,zMin:-23,zMax:-15});
+  }
+
+  function onResize(){
+    if(!renderer || !camera) return;
+    isMobile = window.innerWidth < 768;
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    // Re-compose the current decorative scene for the new aspect ratio.
+    buildScene(activeStage);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.5 : 2));
+  }
+
+  function onVisibility(){
+    running = !document.hidden;
+    if(running){ if(!animId) animate(); }
+    else { if(animId){ cancelAnimationFrame(animId); animId = null; } }
+  }
+
+  function animate(){
+    if(!running){ animId = null; return; }
+    animId = requestAnimationFrame(animate);
+    if(!scene || !camera || !renderer) return;
+    const t = clock ? clock.getElapsedTime() : performance.now()/1000;
+
+    currentStageObjects.forEach(function(item){
+      const o = item.obj;
+      if(!o) return;
+      // Float up/down
+      o.position.y = item.baseY + Math.sin(t*0.6 + item.phase)*0.4;
+      // Rotation
+      if(item.type === 'sphere'){
+        o.rotation.x = t*0.3 + item.phase;
+        o.rotation.y = t*0.4 + item.phase;
+      } else if(item.type === 'butterfly'){
+        o.rotation.z = Math.sin(t*0.7 + item.phase)*0.15;
+        o.rotation.y = Math.sin(t*0.4 + item.phase)*0.25;
+        // wing flap via scale pulse
+        const s = 1 + Math.sin(t*2.0 + item.phase)*0.06;
+        o.scale.y = s;
+      } else if(item.type === 'heart'){
+        o.rotation.y = t*0.35 + item.phase;
+      } else if(item.type === 'flower'){
+        o.rotation.z = t*0.2 + item.phase;
+      } else if(item.type === 'star'){
+        o.rotation.z = t*0.3 + item.phase;
+        o.rotation.y = t*0.2;
+      } else if(item.type === 'ring'){
+        o.rotation.z = t*0.25 + item.phase;
+        o.rotation.y = t*0.15 + item.phase;
+      } else if(item.type === 'gem' || item.type === 'ico'){
+        o.rotation.x = t*0.4 + item.phase;
+        o.rotation.y = t*0.5 + item.phase;
+      } else if(item.type === 'box'){
+        o.rotation.x = t*0.3 + item.phase;
+        o.rotation.y = t*0.4 + item.phase;
+      }
+    });
+
+    // Particles drift
+    scene.children.forEach(function(ch){
+      if(ch.isPoints && ch.userData && ch.userData.speeds){
+        const pos = ch.geometry.attributes.position.array;
+        const n = ch.userData.count;
+        for(let i=0;i<n;i++){
+          const sp = ch.userData.speeds[i];
+          pos[i*3+1] += sp.y;
+          pos[i*3]   += Math.sin(t*0.4 + sp.phase) * 0.006;
+          if(pos[i*3+1] > 18) pos[i*3+1] = -18;
+        }
+        ch.geometry.attributes.position.needsUpdate = true;
+      }
+    });
+
+    renderer.render(scene, camera);
+  }
+
+  return {
+    init: init,
+    setStage: function(stage){ if(scene) buildScene(stage); },
+    isReady: function(){ return !!renderer; }
+  };
+})();
+
+
+/* ============================================================
+   GAME LOGIC – preserved
+   ============================================================ */
+const STORAGE_KEY = 'jazire_v17';
+
+const Sound = (function(){
+  let ctx = null, musicTimer = null, musicOn = true, sfxOn = true;
+  let musicGain = null, sfxGain = null;
+  function ensureCtx(){
+    if(ctx) return ctx;
+    try{
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      musicGain = ctx.createGain(); musicGain.gain.value = 0.045; musicGain.connect(ctx.destination);
+      sfxGain = ctx.createGain(); sfxGain.gain.value = 0.16; sfxGain.connect(ctx.destination);
+    }catch(e){ ctx = null; }
+    return ctx;
+  }
+  function tone(freq, dur, type, when, vol, target){
+    if(!ensureCtx()) return;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    const t0 = ctx.currentTime + (when||0);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol||0.3, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(target || sfxGain);
+    o.start(t0); o.stop(t0 + dur + 0.05);
+  }
+  const MELODY = [
+    [523.25,0.0],[659.25,0.45],[783.99,0.9],[659.25,1.35],
+    [587.33,1.8],[698.46,2.25],[880.00,2.7],[698.46,3.15],
+    [523.25,3.6],[659.25,4.05],[783.99,4.5],[1046.5,4.95],
+    [880.00,5.4],[783.99,5.85],[659.25,6.3],[523.25,6.75]
+  ];
+  function scheduleMusic(){
+    if(!musicOn || !ensureCtx()) return;
+    MELODY.forEach(function(n){ tone(n[0], 0.55, 'triangle', n[1], 0.09, musicGain); });
+    musicTimer = setTimeout(scheduleMusic, 7400);
+  }
+  return {
+    init: function(){ ensureCtx(); },
+    startMusic: function(){ if(!musicOn) return; ensureCtx(); if(musicTimer) clearTimeout(musicTimer); scheduleMusic(); },
+    stopMusic: function(){ if(musicTimer){ clearTimeout(musicTimer); musicTimer = null; } },
+    toggleMusic: function(){ musicOn = !musicOn; if(musicOn) this.startMusic(); else this.stopMusic(); return musicOn; },
+    toggleSfx: function(){ sfxOn = !sfxOn; return sfxOn; },
+    get musicOn(){ return musicOn; },
+    get sfxOn(){ return sfxOn; },
+    click: function(){ if(!sfxOn) return; tone(660, 0.08, 'square', 0, 0.12); },
+    correct: function(){ if(!sfxOn) return; tone(523.25,0.12,'sine',0,0.22); tone(659.25,0.12,'sine',0.09,0.22); tone(783.99,0.2,'sine',0.18,0.22); },
+    wrong: function(){ if(!sfxOn) return; tone(311.13,0.18,'sawtooth',0,0.14); tone(246.94,0.22,'sawtooth',0.14,0.14); },
+    win: function(){ if(!sfxOn) return; [523.25,659.25,783.99,1046.5].forEach(function(f,i){ tone(f,0.25,'triangle',i*0.12,0.2); }); },
+    cut: function(){ if(!sfxOn) return; tone(880,0.05,'square',0,0.1); tone(1200,0.05,'square',0.06,0.08); },
+    pop: function(){ if(!sfxOn) return; tone(720,0.06,'sine',0,0.14); },
+    heartLost: function(){ if(!sfxOn) return; tone(392,0.2,'triangle',0,0.18); tone(311.13,0.25,'triangle',0.12,0.18); }
+  };
+})();
+
+function defaultState(){
+  return {
+    student:{first:'',last:''}, startedAt:null, startTs:null,
+    stageScores:{s1:0,s2:0,s3:0,s4:0,s5:0,s6:0},
+    stageStats:{
+      s1:{q:0,correct:0,wrong:0,tries:0,hints:0}, s2:{q:0,correct:0,wrong:0,tries:0,hints:0},
+      s3:{q:0,correct:0,wrong:0,tries:0,hints:0}, s4:{q:0,correct:0,wrong:0,tries:0,hints:0},
+      s5:{q:0,correct:0,wrong:0,tries:0,hints:0}, s6:{q:0,correct:0,wrong:0,tries:0,hints:0}
+    },
+    skills:{axis:0,symshape:0,halfmatch:0,mirrorDraw:0,paircell:0,twoway:0,fourway:0,colorpattern:0,counting:0,cut3d:0},
+    skillTries:{axis:0,symshape:0,halfmatch:0,mirrorDraw:0,paircell:0,twoway:0,fourway:0,colorpattern:0,counting:0,cut3d:0},
+    completed:{s1:false,s2:false,s3:false,s4:false,s5:false,s6:false},
+    s1Cards:[false,false,false,false,false],
+    s2Missions:[false,false,false,false,false],
+    s3Missions:[false,false,false,false,false],
+    s4Levels:[false,false,false,false],
+    currentStage:'home', badgeCount:0, answersLog:[],
+    lives: 6, maxLives: 6
+  };
+}
+let S;
+try{
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+    const p = JSON.parse(raw), d = defaultState();
+    S = Object.assign({}, d, p);
+    S.student = Object.assign({}, d.student, p.student||{});
+    S.stageScores = Object.assign({}, d.stageScores, p.stageScores||{});
+    S.stageStats = Object.assign({}, d.stageStats, p.stageStats||{});
+    S.skills = Object.assign({}, d.skills, p.skills||{});
+    S.skillTries = Object.assign({}, d.skillTries, p.skillTries||{});
+    S.completed = Object.assign({}, d.completed, p.completed||{});
+    S.s1Cards = p.s1Cards||d.s1Cards;
+    S.s2Missions = Array.isArray(p.s2Missions) ? p.s2Missions.slice(0,5) : d.s2Missions;
+    while(S.s2Missions.length < 5) S.s2Missions.push(false);
+    S.s3Missions = p.s3Missions||d.s3Missions;
+    S.s4Levels = p.s4Levels||d.s4Levels;
+    S.answersLog = p.answersLog||[];
+    if(typeof S.lives !== 'number') S.lives = 6;
+    S.lives = Math.max(0, Math.min(S.maxLives || 6, S.lives));
+  } else { S = defaultState(); }
+}catch(e){ S = defaultState(); }
+
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){} }
+
+function renderLives(){
+  const bar = document.getElementById('livesBar');
+  if(!bar) return;
+  const hearts = bar.querySelectorAll('.heart');
+  hearts.forEach(function(h, i){
+    if(i < S.lives) h.classList.remove('lost');
+    else h.classList.add('lost');
+  });
+}
+function loseLife(reason){
+  if(S.lives <= 0) return;
+  S.lives -= 1;
+  saveState();
+  renderLives();
+  Sound.heartLost();
+  const bar = document.getElementById('livesBar');
+  if(bar){
+    const hearts = bar.querySelectorAll('.heart');
+    if(hearts[S.lives]){
+      hearts[S.lives].classList.add('pulse');
+      setTimeout(function(){ hearts[S.lives].classList.remove('pulse'); }, 450);
+    }
+  }
+  if(S.lives <= 0){
+    setTimeout(showGameOverModal, 400);
+  }
+}
+function resetLives(full){
+  S.lives = full ? (S.maxLives || 6) : S.lives;
+  saveState();
+  renderLives();
+}
+function showGameOverModal(){
+  openModal(
+    '<div class="heart-loss-modal">' +
+      '<h3 style="color:var(--red)">💔 جان‌هایت تمام شد!</h3>' +
+      '<p>برای ادامه می‌توانی دوباره تلاش کنی یا به خانه برگردی.</p>' +
+      '<div class="big-hearts">🤍🤍🤍🤍🤍🤍</div>' +
+      '<div class="row" style="justify-content:center;flex-wrap:wrap;margin-top:12px">' +
+        '<button class="btn sun" id="goRetry">🔄 تلاش دوباره</button>' +
+        '<button class="btn ghost" id="goHome">🏠 بازگشت به خانه</button>' +
+      '</div>' +
+    '</div>'
+  );
+  const retry = document.getElementById('goRetry');
+  const home = document.getElementById('goHome');
+  if(retry) retry.addEventListener('click', function(){
+    document.getElementById('modalBack').classList.add('hidden');
+    resetLives(true);
+    const stage = S.currentStage || 's1';
+    if(stage === 'home') { show('screen-home'); updateTopbar(); }
+    else if(stage === 'lesson'){ show('screen-lesson'); initLesson(); }
+    else if(stage === 's1'){ show('screen-s1'); initStage1(); }
+    else if(stage === 's2'){ show('screen-s2'); initStage2(); }
+    else if(stage === 's3'){ show('screen-s3'); initStage3(); }
+    else if(stage === 's4'){ show('screen-s4'); initStage4(); }
+    else if(stage === 's5'){ show('screen-s5'); initStage5(); }
+    else if(stage === 's6'){ show('screen-s6'); initStage6(); }
+    updateTopbar();
+    toast('جان‌ها پر شد! ✨');
+  });
+  if(home) home.addEventListener('click', function(){
+    document.getElementById('modalBack').classList.add('hidden');
+    goHome();
+  });
+}
+
+function celebrateStars(){
+  const old=document.querySelector('.star-rain'); if(old) old.remove();
+  const layer=document.createElement('div'); layer.className='star-rain'; layer.setAttribute('aria-hidden','true');
+  const colors=['#ffb703','#f26d9c','#8d6cc9','#37b3a4','#2e8bc0','#ff7b00'];
+  for(let i=0;i<42;i++){
+    const star=document.createElement('span'); star.className='fall-star'; star.textContent=['★','⭐','✦'][i%3];
+    star.style.setProperty('--x',(Math.random()*100)+'%');
+    star.style.setProperty('--size',(16+Math.random()*22)+'px');
+    star.style.setProperty('--color',colors[i%colors.length]);
+    star.style.setProperty('--dur',(2.0+Math.random()*1.8)+'s');
+    star.style.setProperty('--delay',(Math.random()*.65)+'s');
+    star.style.setProperty('--drift',((Math.random()-.5)*180)+'px');
+    star.style.setProperty('--spin',((Math.random()-.5)*900)+'deg');
+    layer.appendChild(star);
+  }
+  document.body.appendChild(layer);
+  window.setTimeout(function(){if(layer.parentNode)layer.remove();},4800);
+}
+
+function totalScore(){ let t=0; for(const k in S.stageScores) t += (S.stageScores[k]||0); return t; }
+function updateTopbar(){
+  const sc = document.getElementById('starCount'); if(sc) sc.textContent = Math.min(120, totalScore());
+  const dots = document.getElementById('progressDots');
+  if(dots){
+    dots.innerHTML = '';
+    const names = ['درس','۱','۲','۳','۴','۵','۶'];
+    const keys = ['lesson','s1','s2','s3','s4','s5','s6'];
+    keys.forEach(function(k,i){
+      const d = document.createElement('div'); d.className='pdot';
+      if(k==='lesson'){ if(S.currentStage!=='home') d.classList.add('active'); }
+      else { if(S.completed[k]) d.classList.add('done'); else if(S.currentStage===k) d.classList.add('active'); }
+      d.textContent = names[i]; dots.appendChild(d);
+    });
+  }
+  const tb = document.getElementById('topbar'); if(tb) tb.classList.toggle('hidden', S.currentStage==='home');
+  renderLives();
+}
+function toast(msg){
+  const t = document.getElementById('toast'); if(!t) return;
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._to); t._to = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+function show(id){
+  ['screen-home','screen-lesson','screen-s1','screen-s2','screen-s3','screen-s4','screen-s5','screen-s6','screen-report']
+    .forEach(function(x){ const el=document.getElementById(x); if(el){ el.classList.add('hidden'); el.classList.remove('screen-fade'); } });
+  const t = document.getElementById(id);
+  if(t){ t.classList.remove('hidden'); t.classList.add('screen-fade'); }
+  window.scrollTo(0,0);
+  const stageMap = {
+    'screen-home':'home',
+    'screen-lesson':'lesson',
+    'screen-s1':'s1',
+    'screen-s2':'s2',
+    'screen-s3':'s3',
+    'screen-s4':'s4',
+    'screen-s5':'s5',
+    'screen-s6':'s6',
+    'screen-report':'report'
+  };
+  if(BG.isReady() && stageMap[id]) BG.setStage(stageMap[id]);
+}
+function fb(el, type, msg){ if(!el) return; el.className = 'feedback '+type; el.textContent = msg; el.classList.remove('hidden'); }
+function recordAnswer(stage, skill, ok, info){
+  if(S.stageStats[stage]) S.stageStats[stage].q++;
+  if(ok){ if(S.stageStats[stage]) S.stageStats[stage].correct++; }
+  else { if(S.stageStats[stage]) S.stageStats[stage].wrong++; }
+  S.skills[skill] = (S.skills[skill]||0) + (ok?1:0);
+  S.skillTries[skill] = (S.skillTries[skill]||0) + 1;
+  S.answersLog.push({stage:stage, skill:skill, ok:ok, t:Date.now(), info:info||''});
+  saveState();
+}
+function openModal(html){
+  const box = document.getElementById('modalBox'); const back = document.getElementById('modalBack');
+  if(!box || !back) return;
+  box.innerHTML = html; back.classList.remove('hidden');
+  const c = box.querySelector('#closeModal'); if(c) c.addEventListener('click', function(){ back.classList.add('hidden'); });
+}
+document.getElementById('modalBack').addEventListener('click', function(e){ if(e.target === this) this.classList.add('hidden'); });
+function goHome(){ S.currentStage='home'; saveState(); show('screen-home'); updateTopbar(); }
+
+document.getElementById('btnMusic').addEventListener('click', function(){
+  const on = Sound.toggleMusic();
+  this.classList.toggle('on', on);
+  this.textContent = on ? '🎵' : '🔇';
+  toast(on ? 'موسیقی روشن شد' : 'موسیقی خاموش شد');
+});
+document.getElementById('btnSfx').addEventListener('click', function(){
+  const on = Sound.toggleSfx();
+  this.classList.toggle('on', on);
+  this.textContent = on ? '🔊' : '🔈';
+  toast(on ? 'صداها روشن شد' : 'صداها خاموش شد');
+});
+
+document.getElementById('btnStart').addEventListener('click', function(){
+  try{
+    Sound.init(); Sound.startMusic(); Sound.click();
+    const fEl = document.getElementById('inpFirst');
+    const fbe = document.getElementById('homeFeedback');
+    const f = (fEl.value||'').trim();
+    if(!f){ fb(fbe, 'bad', 'لطفاً نام خود را وارد کن. 🙂'); fEl.focus(); return; }
+    S.student.first = f; S.student.last = '';
+    if(!S.startTs){ S.startTs = Date.now(); S.startedAt = new Date().toLocaleString('fa-IR'); }
+    if(!S.startedAt) resetLives(true);
+    S.currentStage = 'lesson'; saveState();
+    show('screen-lesson'); updateTopbar(); initLesson();
+  }catch(err){ console.error(err); alert('خطا: '+err.message); }
+});
+document.getElementById('btnBackHomeFromLesson').addEventListener('click', function(){ Sound.click(); goHome(); });
+
+/* LESSON */
+const lessonDone = {ex1:false, ex2:false, ex3:false};
+function initLesson(){
+  try{
+    const wrap = document.getElementById('symDemoWrap');
+    if(wrap && !wrap._bound){
+      wrap._bound = true;
+      const shapes = [
+        {svg:'<line x1="130" y1="8" x2="130" y2="152" class="sym-axis"/><path d="M130 60 C100 20 60 60 130 85 C200 60 160 20 130 60Z" fill="#f26d9c"/><path d="M130 85 C105 105 85 130 130 125 C175 130 155 105 130 85Z" fill="#f9b3cc"/>', ans:'yes', why:'متقارن است.'},
+        {svg:'<line x1="130" y1="8" x2="130" y2="152" class="sym-axis"/><rect x="60" y="40" width="70" height="80" fill="#2e8bc0"/><rect x="130" y="55" width="55" height="55" fill="#2e8bc0"/>', ans:'no', why:'دو طرف برابر نیستند.'}
+      ];
+      let idx = 0, answered = null;
+      function render(){
+        wrap.innerHTML = '<svg class="svg-demo" viewBox="0 0 260 160">'+shapes[idx].svg+'</svg>';
+        answered = null;
+        document.querySelectorAll('[data-sym]').forEach(function(b){ b.classList.remove('good','bad'); });
+        const sf = document.getElementById('symFeedback'); if(sf) sf.classList.add('hidden');
+      }
+      render();
+      document.querySelectorAll('[data-sym]').forEach(function(btn){
+        if(btn._bound) return; btn._bound = true;
+        btn.addEventListener('click', function(){
+          if(answered !== null) return;
+          const d = shapes[idx]; const ok = btn.dataset.sym === d.ans;
+          answered = btn.dataset.sym;
+          btn.classList.add(ok ? 'good':'bad');
+          if(ok) Sound.correct(); else { Sound.wrong(); loseLife('lesson-sym'); }
+          recordAnswer('s1','symshape', ok, 'lesson-sym');
+          fb(document.getElementById('symFeedback'), ok?'ok':'info', (ok?'✅ ':'💡 ')+d.why);
+          if(ok) setTimeout(function(){ idx=(idx+1)%shapes.length; render(); }, 2200);
+        });
+      });
+    }
+    buildEx('ex1', [
+      {label:'الف', ok:false, svg:'<svg viewBox="0 0 100 100" style="width:70px"><line x1="10" y1="50" x2="90" y2="50" class="sym-axis"/><rect x="30" y="20" width="40" height="60" fill="#2e8bc0"/></svg>', why:'این خط عمودی نیست.'},
+      {label:'ب', ok:true, svg:'<svg viewBox="0 0 100 100" style="width:70px"><line x1="50" y1="10" x2="50" y2="90" class="sym-axis"/><rect x="30" y="20" width="40" height="60" fill="#2e8bc0"/></svg>', why:'درست است.'}
+    ], 'axis', 'ex1');
+    buildEx('ex2', [
+      {label:'قلب', ok:true, svg:'<svg viewBox="0 0 100 100" style="width:60px"><line x1="50" y1="8" x2="50" y2="92" class="sym-axis"/><path d="M50 80 C20 55 20 25 50 25 C80 25 80 55 50 80Z" fill="#f26d9c"/></svg>', why:'متقارن است.'},
+      {label:'مثلث', ok:false, svg:'<svg viewBox="0 0 100 100" style="width:60px"><line x1="50" y1="8" x2="50" y2="92" class="sym-axis"/><path d="M20 80 L70 80 L40 20 Z" fill="#4caf7d"/></svg>', why:'متقارن نیست.'}
+    ], 'symshape', 'ex2');
+    buildEx('ex3', [
+      {label:'آبی و زرد', ok:true, svg:'<svg viewBox="0 0 100 100" style="width:70px"><circle cx="30" cy="50" r="16" fill="#2e8bc0"/><circle cx="70" cy="50" r="16" fill="#ffb703"/></svg>', why:'رنگ‌ها متناظر هستند.'},
+      {label:'هر دو زرد', ok:false, svg:'<svg viewBox="0 0 100 100" style="width:70px"><circle cx="30" cy="50" r="16" fill="#ffb703"/><circle cx="70" cy="50" r="16" fill="#ffb703"/></svg>', why:'باید متناظر باشند.'}
+    ], 'colorpattern', 'ex3');
+    const btnEnter = document.getElementById('btnEnterMission');
+    if(btnEnter && !btnEnter._bound){
+      btnEnter._bound = true;
+      btnEnter.addEventListener('click', function(){
+        Sound.click();
+        S.currentStage='s1'; saveState();
+        show('screen-s1'); updateTopbar(); initStage1();
+      });
+    }
+  }catch(err){ console.error(err); }
+}
+function buildEx(id, opts, skill, exName){
+  const el = document.getElementById(id);
+  if(!el || el._bound) return;
+  el._bound = true;
+  opts.forEach(function(o){
+    const b = document.createElement('button'); b.className='opt';
+    b.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;gap:6px">'+o.svg+'<span>'+o.label+'</span></div>';
+    b.addEventListener('click', function(){
+      if(lessonDone[exName]) return;
+      b.classList.add(o.ok?'good':'bad');
+      if(o.ok) Sound.correct(); else { Sound.wrong(); loseLife('lesson-'+exName); }
+      recordAnswer('s1', skill, o.ok, 'lesson-'+exName);
+      fb(document.getElementById('lessonFeedback'), o.ok?'ok':'info', (o.ok?'✅ آفرین! ':'💡 ')+o.why);
+      if(o.ok) lessonDone[exName] = true;
+      checkLessonComplete();
+    });
+    el.appendChild(b);
+  });
+}
+function checkLessonComplete(){
+  if(lessonDone.ex1 && lessonDone.ex2 && lessonDone.ex3){
+    const b = document.getElementById('btnEnterMission'); if(b) b.disabled = false;
+    fb(document.getElementById('lessonFeedback'),'ok','🎉 درسنامه تمام شد!');
+  }
+}
+
+/* =========================================================
+   STAGE 1
+   ========================================================= */
+const S1_SHAPES = [
+  {name:'قلب', full:'<path d="M50 90 C10 55 10 20 50 30 C90 20 90 55 50 90Z" fill="#e35b6d"/>'},
+  {name:'پروانه', full:'<path d="M50 30 C25 0 10 40 50 55 C90 40 75 0 50 30Z" fill="#f26d9c"/><path d="M50 55 C35 70 30 90 50 85 C70 90 65 70 50 55Z" fill="#f9b3cc"/><ellipse cx="50" cy="57" rx="2" ry="12" fill="#1f3a4d"/>'},
+  {name:'خانه', full:'<path d="M12 46 L50 14 L88 46 Z" fill="#e35b6d" stroke="#9b3447" stroke-width="2" stroke-linejoin="round"/><rect x="22" y="45" width="56" height="40" rx="2" fill="#f5c76a" stroke="#b78332" stroke-width="2"/><rect x="42" y="62" width="16" height="23" rx="2" fill="#7b5a43"/><rect x="28" y="53" width="10" height="10" fill="#75c9e8" stroke="#427f9a" stroke-width="1.5"/><rect x="62" y="53" width="10" height="10" fill="#75c9e8" stroke="#427f9a" stroke-width="1.5"/><circle cx="54" cy="74" r="1.2" fill="#ffe6a6"/>'},
+  {name:'مربع', full:'<rect x="20" y="20" width="60" height="60" fill="#2e8bc0" rx="3"/>'},
+  {name:'لوزی', full:'<path d="M50 15 L85 50 L50 85 L15 50 Z" fill="#4caf7d"/>'}
+];
+let s1Selected = -1, s1HasCut = false, s1CutPct = 0.5;
+let s1LeftPiece = null, s1RightPiece = null;
+
+function initStage1(){
+  const gallery = document.getElementById('s1Gallery');
+  if(!gallery) return;
+  gallery.innerHTML = '';
+  S1_SHAPES.forEach(function(sh, i){
+    const card = document.createElement('div');
+    card.className = 's1-card' + (S.s1Cards[i]?' done':'');
+    card.innerHTML = '<svg class="thumb" viewBox="0 0 100 100">' + sh.full + '<line x1="50" y1="5" x2="50" y2="95" stroke="#e35b6d" stroke-width="1.5" stroke-dasharray="3 3"/></svg>' +
+      '<div class="title">' + sh.name + '</div>' +
+      '<div class="status">' + (S.s1Cards[i]?'✅ کامل — دوباره بازی کن':'▶ برای شروع ضربه بزن') + '</div>';
+    card.addEventListener('click', function(){ Sound.click(); openS1Room(i); });
+    gallery.appendChild(card);
+  });
+  const allDone = S.s1Cards.every(Boolean);
+  document.getElementById('s1Next').disabled = !allDone;
+  if(allDone) fb(document.getElementById('s1Feedback'),'ok','🎉 همه کامل! به مرحله بعد برو.');
+  document.getElementById('s1GalleryView').classList.remove('hidden');
+  document.getElementById('s1RoomView').classList.add('hidden');
+}
+
+function openS1Room(idx){
+  s1Selected = idx; s1HasCut = false; s1CutPct = 0.5;
+  s1LeftPiece = null; s1RightPiece = null;
+  document.getElementById('s1GalleryView').classList.add('hidden');
+  document.getElementById('s1RoomView').classList.remove('hidden');
+  document.getElementById('s1RoomTitle').textContent = S1_SHAPES[idx].name;
+  document.getElementById('s1RoomFeedback').classList.add('hidden');
+  buildS1Room();
+  setupS1Cut();
+}
+
+function buildS1Room(){
+  const room = document.getElementById('s1Room');
+  if(!room) return;
+  room.querySelectorAll('.s1-half, .s1-whole').forEach(function(el){ el.remove(); });
+  const sh = S1_SHAPES[s1Selected];
+  const W = room.clientWidth || 400;
+  const H = room.clientHeight || 400;
+
+  const whole = document.createElement('div');
+  whole.className = 's1-whole'; whole.id = 's1Whole';
+  whole.innerHTML = '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">' + sh.full + '</svg>';
+  room.appendChild(whole);
+
+  const leftEl = document.createElement('div');
+  leftEl.className = 's1-half locked';
+  leftEl.style.cssText = 'width:'+(W*0.5)+'px;height:'+H+'px;left:0;top:0;opacity:0;pointer-events:none';
+  leftEl.innerHTML = '<svg viewBox="0 0 50 100" preserveAspectRatio="none"><g>' + sh.full + '</g></svg>';
+  room.appendChild(leftEl);
+  s1LeftPiece = {el:leftEl, x:0, y:0, w:W*0.5, h:H};
+
+  const rightEl = document.createElement('div');
+  rightEl.className = 's1-half locked';
+  rightEl.style.cssText = 'width:'+(W*0.5)+'px;height:'+H+'px;left:'+(W*0.5)+'px;top:0;opacity:0;pointer-events:none';
+  rightEl.innerHTML = '<svg viewBox="50 0 50 100" preserveAspectRatio="none"><g>' + sh.full + '</g></svg>';
+  room.appendChild(rightEl);
+  s1RightPiece = {el:rightEl, x:W*0.5, y:0, w:W*0.5, h:H};
+
+  document.getElementById('s1RoomAxis').classList.remove('visible');
+  document.getElementById('s1RoomCut').classList.remove('hidden');
+  document.getElementById('s1RoomCut').style.left = '50%';
+  document.getElementById('s1RoomLabel').textContent = 'مرحله ۱: شکل را دقیقاً از وسط برش بزن';
+  document.getElementById('s1RoomHint').textContent = '💡 خط برش دقیقاً از وسط شکل می‌گذرد. برای جدا کردن دو نیمه، «برش بزن» را انتخاب کن.';
+}
+
+function setupS1Cut(){
+  const cut = document.getElementById('s1RoomCut');
+  if(!cut) return;
+  s1CutPct = 0.5;
+  cut.style.left = '50%';
+  cut.style.pointerEvents = 'none';
+  cut.style.cursor = 'default';
+}
+
+document.getElementById('s1CutBtn').addEventListener('click', function(){
+  if(s1HasCut) return;
+  Sound.cut();
+  s1CutPct = 0.5;
+  const whole = document.getElementById('s1Whole');
+  if(whole) whole.style.display = 'none';
+  const pl = s1LeftPiece;
+  pl.el.style.opacity = '1';
+  pl.el.style.pointerEvents = 'none';
+  pl.el.classList.remove('locked');
+  pl.el.classList.add('fixed');
+  const pr = s1RightPiece;
+  pr.el.style.opacity = '1';
+  pr.el.style.pointerEvents = 'auto';
+  pr.el.classList.remove('locked');
+  pr.x = pr.w + 34;
+  pr.y = 0;
+  pr.el.style.left = pr.x+'px';
+  pr.el.style.top = pr.y+'px';
+  s1HasCut = true;
+  document.getElementById('s1RoomCut').classList.add('hidden');
+  document.getElementById('s1RoomAxis').classList.add('visible');
+  document.getElementById('s1RoomLabel').textContent = 'مرحله ۲: نیمه راست را جابه‌جا کن و به نیمه چپ بچسبان';
+  document.getElementById('s1RoomHint').textContent = '👆 نیمه راست جدا شده است! آن را بگیر و به سمت چپ بکش تا دقیقاً به نیمه دیگر بچسبد؛ سپس «اتصال درست است» را بزن.';
+  bindS1RightDrag();
+  fb(document.getElementById('s1RoomFeedback'), 'ok', '✂️ برش انجام شد! نیمه راست جدا شد؛ حالا آن را بکش و به نیمه چپ بچسبان.');
+});
+
+function bindS1RightDrag(){
+  const p = s1RightPiece;
+  if(!p || p.el._boundDrag) return;
+  p.el._boundDrag = true;
+  let drag = null;
+  p.el.addEventListener('pointerdown', function(e){
+    if(!s1HasCut) return;
+    e.preventDefault(); e.stopPropagation();
+    try{ p.el.setPointerCapture(e.pointerId); }catch(err){}
+    drag = {sx:e.clientX, sy:e.clientY, ox:p.x, oy:p.y};
+    p.el.classList.add('moving');
+  });
+  p.el.addEventListener('pointermove', function(e){
+    if(!drag) return;
+    p.x = drag.ox + (e.clientX - drag.sx);
+    p.y = drag.oy + (e.clientY - drag.sy);
+    p.el.style.left = p.x+'px';
+    p.el.style.top = p.y+'px';
+  });
+  function end(){ drag = null; p.el.classList.remove('moving'); }
+  p.el.addEventListener('pointerup', end);
+  p.el.addEventListener('pointercancel', end);
+}
+
+document.getElementById('s1Back').addEventListener('click', function(){
+  Sound.click();
+  document.getElementById('s1GalleryView').classList.remove('hidden');
+  document.getElementById('s1RoomView').classList.add('hidden');
+  initStage1();
+});
+document.getElementById('s1Reset').addEventListener('click', function(){
+  Sound.click();
+  s1HasCut = false; s1CutPct = 0.5;
+  s1LeftPiece = null; s1RightPiece = null;
+  buildS1Room();
+  document.getElementById('s1RoomFeedback').classList.add('hidden');
+});
+document.getElementById('s1CheckRoom').addEventListener('click', function(){
+  if(!s1HasCut){ fb(document.getElementById('s1RoomFeedback'), 'info', 'ابتدا «برش بزن».'); return; }
+  S.stageStats.s1.tries++;
+  const pl = s1LeftPiece, pr = s1RightPiece;
+  const targetX = pl.x + pl.w;
+  const gap = Math.abs(pr.x - targetX);
+  const yOK = Math.abs(pl.y - pr.y) < 25;
+  const ok = gap < 20 && yOK;
+  const fE = document.getElementById('s1RoomFeedback');
+  if(ok){
+    Sound.correct();
+    if(!S.s1Cards[s1Selected]){
+      S.s1Cards[s1Selected] = true;
+      S.skills.halfmatch++; S.skillTries.halfmatch++;
+      recordAnswer('s1','halfmatch', true, 'gallery-'+s1Selected);
+      fb(fE, 'ok', '🎉 آفرین قهرمان! نیمه‌ها را درست به هم چسباندی! 👏');
+      if(S.s1Cards.every(Boolean) && !S.completed.s1){
+        S.stageScores.s1 = 20; S.completed.s1 = true; S.badgeCount++;
+        fb(document.getElementById('s1Feedback'), 'ok', '🎊 همه ۵ شکل کامل شد! +۲۰ امتیاز');
+        document.getElementById('s1Next').disabled = false;
+      }
+      saveState(); updateTopbar();
+      window.setTimeout(function(){
+        celebrateStars();
+        const nextIdx = S.s1Cards.findIndex(function(done, i){ return !done && i !== s1Selected; });
+        if(nextIdx !== -1){ openS1Room(nextIdx); }
+        else if(S.s1Cards.every(Boolean)){
+          document.getElementById('s1RoomView').classList.add('hidden');
+          document.getElementById('s1GalleryView').classList.remove('hidden');
+          initStage1();
+          fb(document.getElementById('s1Feedback'), 'ok', '🏆 فوق‌العاده بود! همه شکل‌ها را کامل کردی. حالا می‌توانی به مرحله بعد بروی.');
+        }
+      }, 1200);
+    } else { fb(fE, 'ok', '✅ درست است!'); }
+  } else {
+    Sound.wrong();
+    loseLife('s1-connect');
+    S.skillTries.halfmatch++;
+    recordAnswer('s1','halfmatch', false, 'gallery-try');
+    let msg = '🙂 هنوز کامل نیست. ';
+    if(!yOK) msg += 'هم‌ارتفاع باشند. ';
+    if(gap >= 20) msg += 'لبه‌ها باید بچسبند. ';
+    fb(fE, 'info', msg);
+  }
+  saveState(); updateTopbar();
+});
+document.getElementById('s1Next').addEventListener('click', function(){
+  Sound.click();
+  celebrateStars();
+  S.currentStage='s2'; saveState(); show('screen-s2'); updateTopbar(); initStage2();
+});
+
+/* =========================================================
+   STAGE 2
+   ========================================================= */
+const S2_MISSIONS = [
+  {id:'circle', name:'دایره', color:'#2e8bc0', halfPath:'M200 100 A100 100 0 0 0 200 300 L200 100 Z'},
+  {id:'heart', name:'قلب', color:'#e35b6d', halfPath:'M200 330 C165 300 95 245 95 190 C95 140 155 125 200 175 L200 330 Z'},
+  {id:'butterfly', name:'پروانه', color:'#f26d9c', halfPath:'M200 195 C170 145 115 130 95 175 C75 220 125 255 200 230 Z M200 195 L200 275'},
+  {id:'house', name:'خانه', color:'#ffb703', halfPath:'M200 105 L90 195 L90 310 L200 310 Z'},
+  {id:'flower', name:'گل ساده', color:'#8d6cc9', halfPath:'M200 200 C175 175 145 180 145 205 C145 230 175 235 200 210 Z M200 200 C175 175 180 145 205 145 C230 145 235 175 210 200 Z M200 200 L200 280'}
+];
+const S2_PALETTE = ['#2e8bc0','#e35b6d','#4caf7d','#ffb703','#8d6cc9','#f26d9c','#37b3a4','#ff7b00'];
+let s2Mission = 0, s2Canvas, s2Ctx, s2Strokes=[], s2Drawing=false, s2CurrentStroke=null, s2PenSize=6, s2Tool='pen';
+let s2PenColor = S2_PALETTE[0];
+
+function initStage2(){
+  const tabs = document.getElementById('s2Tabs'); if(!tabs) return;
+  const firstPending = S.s2Missions.findIndex(function(done){ return !done; });
+  if(firstPending < 0){
+    S.currentStage='s3'; saveState(); show('screen-s3'); updateTopbar(); initStage3();
+    fb(document.getElementById('s3Feedback'),'ok','🏆 آفرین! همه شکل‌های نیمه‌گمشده را کامل کرده‌ای. ستاره‌باران! حالا مرحله بعد را شروع کن.');
+    celebrateStars();
+    return;
+  }
+  s2Mission = firstPending;
+  tabs.innerHTML = '';
+  S2_MISSIONS.forEach(function(m,i){
+    const b = document.createElement('button');
+    b.className = 'mtab' + (i===s2Mission?' active':'') + (S.s2Missions[i]?' done':'');
+    b.textContent = (i+1);
+    b.disabled = i !== s2Mission;
+    tabs.appendChild(b);
+  });
+  s2PenColor = S2_MISSIONS[s2Mission].color;
+  const ghost = document.getElementById('s2Ghost');
+  if(ghost){
+    const m = S2_MISSIONS[s2Mission];
+    ghost.innerHTML = '<svg viewBox="0 0 400 400" preserveAspectRatio="none" style="width:100%;height:100%;display:block"><rect x="0" y="0" width="200" height="400" fill="#f2f9ff"/><path d="'+m.halfPath+'" fill="'+m.color+'" stroke="#234b63" stroke-width="5" stroke-linejoin="round" opacity="1"/><line x1="200" y1="0" x2="200" y2="400" stroke="#e35b6d" stroke-width="3" stroke-dasharray="10 8"/><text x="100" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#1a5e8a">نیمه‌ی کامل</text><text x="300" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#1a5e8a">نیمه‌ی تو</text></svg>';
+  }
+  s2Canvas = document.getElementById('s2Canvas');
+  if(!s2Canvas) return;
+  s2Ctx = s2Canvas.getContext('2d');
+  s2Strokes = []; s2Drawing = false;
+  resizeCanvas2();
+  bindS2();
+  buildS2Palette();
+  const nx = document.getElementById('s2Next'); if(nx) nx.disabled = !S.s2Missions[s2Mission];
+  const fE = document.getElementById('s2Feedback'); if(fE) fE.classList.add('hidden');
+  updateS2Tools();
+}
+function buildS2Palette(){
+  const pal = document.getElementById('s2Palette'); if(!pal) return;
+  pal.innerHTML = '';
+  S2_PALETTE.forEach(function(col){
+    const b = document.createElement('button');
+    b.className = 'pal' + (col===s2PenColor?' sel':'');
+    b.style.background = col;
+    b.style.width = '32px';
+    b.style.height = '32px';
+    b.title = 'انتخاب رنگ';
+    b.addEventListener('click', function(){
+      Sound.click();
+      pal.querySelectorAll('.pal').forEach(function(x){ x.classList.remove('sel'); });
+      b.classList.add('sel');
+      s2PenColor = col;
+    });
+    pal.appendChild(b);
+  });
+}
+function resizeCanvas2(){
+  const w = document.getElementById('s2Wrap'); if(!w || !s2Canvas) return;
+  const r = w.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  s2Canvas.width = Math.max(1, Math.floor(r.width*dpr));
+  s2Canvas.height = Math.max(1, Math.floor(r.height*dpr));
+  s2Canvas.style.width = r.width+'px';
+  s2Canvas.style.height = r.height+'px';
+  s2Ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+function bindS2(){
+  if(!s2Canvas || s2Canvas._bound) return;
+  s2Canvas._bound = true;
+  function getPt(e){ const r = s2Canvas.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
+  s2Canvas.addEventListener('pointerdown', function(e){
+    e.preventDefault();
+    try{ s2Canvas.setPointerCapture(e.pointerId); }catch(err){}
+    const p = getPt(e);
+    if(p.x < s2Canvas.getBoundingClientRect().width/2) return;
+    s2Drawing = true;
+    s2CurrentStroke = {tool: s2Tool, size: s2PenSize, color: s2PenColor, points: [p]};
+    s2Strokes.push(s2CurrentStroke); redrawS2();
+  });
+  s2Canvas.addEventListener('pointermove', function(e){
+    if(!s2Drawing || !s2CurrentStroke) return;
+    e.preventDefault();
+    s2CurrentStroke.points.push(getPt(e)); redrawS2();
+  });
+  function end(){ s2Drawing = false; s2CurrentStroke = null; }
+  s2Canvas.addEventListener('pointerup', end);
+  s2Canvas.addEventListener('pointercancel', end);
+}
+function redrawS2(){
+  if(!s2Ctx) return;
+  const r = s2Canvas.getBoundingClientRect();
+  s2Ctx.clearRect(0,0,r.width,r.height);
+  s2Ctx.lineCap = 'round'; s2Ctx.lineJoin = 'round';
+  s2Strokes.forEach(function(st){
+    if(st.tool === 'eraser'){
+      s2Ctx.globalCompositeOperation = 'destination-out';
+      s2Ctx.lineWidth = st.size * 2.5;
+      s2Ctx.strokeStyle = 'rgba(0,0,0,1)';
+    } else {
+      s2Ctx.globalCompositeOperation = 'source-over';
+      s2Ctx.strokeStyle = st.color || '#2e8bc0';
+      s2Ctx.lineWidth = st.size;
+    }
+    s2Ctx.beginPath();
+    if(!st.points.length) return;
+    s2Ctx.moveTo(st.points[0].x, st.points[0].y);
+    for(let i=1;i<st.points.length;i++) s2Ctx.lineTo(st.points[i].x, st.points[i].y);
+    s2Ctx.stroke();
+  });
+  s2Ctx.globalCompositeOperation = 'source-over';
+}
+function updateS2Tools(){
+  document.querySelectorAll('#screen-s2 .tool-btn[data-size]').forEach(function(b){
+    b.classList.toggle('sel', parseInt(b.dataset.size)===s2PenSize);
+  });
+  const pen = document.getElementById('s2Pen'); const er = document.getElementById('s2Eraser');
+  if(pen) pen.classList.toggle('sel', s2Tool === 'pen');
+  if(er) er.classList.toggle('sel', s2Tool === 'eraser');
+}
+document.querySelectorAll('#screen-s2 .tool-btn[data-size]').forEach(function(b){
+  b.addEventListener('click', function(){ Sound.pop(); s2PenSize = parseInt(b.dataset.size); updateS2Tools(); });
+});
+document.getElementById('s2Pen').addEventListener('click', function(){ Sound.click(); s2Tool='pen'; updateS2Tools(); });
+document.getElementById('s2Eraser').addEventListener('click', function(){ Sound.click(); s2Tool='eraser'; updateS2Tools(); });
+document.getElementById('s2Undo').addEventListener('click', function(){ Sound.click(); if(s2Strokes.length){ s2Strokes.pop(); redrawS2(); } });
+document.getElementById('s2Clear').addEventListener('click', function(){ Sound.click(); s2Strokes = []; redrawS2(); });
+document.getElementById('s2Hint').addEventListener('click', function(){
+  Sound.click();
+  S.stageStats.s2.hints++; saveState();
+  fb(document.getElementById('s2Feedback'),'info','💡 از شکل‌های ساده شروع کن؛ لازم نیست خطت کاملاً بی‌نقص باشد، اما باید شبیه مسیر قرینه باشد و از شکل خیلی دور نشود. رنگ نیمه‌ی خودت را هم می‌توانی از پالت انتخاب کنی!');
+});
+document.getElementById('s2Check').addEventListener('click', function(){
+  S.stageStats.s2.tries++;
+  const drawStrokes = s2Strokes.filter(function(s){ return s.tool === 'pen'; });
+  const totalPts = drawStrokes.reduce(function(a,s){ return a+s.points.length; }, 0);
+  const fE = document.getElementById('s2Feedback');
+  if(totalPts < 5){
+    Sound.wrong(); loseLife('s2-empty');
+    fb(fE, 'bad', '✏️ هنوز چیزی نکشیده‌ای. با قلم در نیمه راست رسم کن.');
+    return;
+  }
+  const w = s2Canvas.getBoundingClientRect().width;
+  const h = s2Canvas.getBoundingClientRect().height;
+  const m = S2_MISSIONS[s2Mission];
+  const targetPts = sampleMirrorRight(m, w, h);
+  const drawnPts = [];
+  drawStrokes.forEach(function(st){ st.points.forEach(function(p){ drawnPts.push(p); }); });
+  function nearestDistance(p, arr){
+    let best = Infinity;
+    arr.forEach(function(q){ const d = Math.hypot(p.x-q.x, p.y-q.y); if(d < best) best = d; });
+    return best;
+  }
+  const drawAvg = drawnPts.reduce(function(sum,p){ return sum + nearestDistance(p,targetPts); },0) / Math.max(1,drawnPts.length);
+  const targetAvg = targetPts.reduce(function(sum,p){ return sum + nearestDistance(p,drawnPts); },0) / Math.max(1,targetPts.length);
+  const tol = Math.max(22, w * 0.08);
+  let score = 1 - ((drawAvg * 0.55 + targetAvg * 0.45) / tol);
+  score = Math.max(0, Math.min(1, score));
+  if(score >= 0.48){
+    Sound.correct();
+    if(!S.s2Missions[s2Mission]){
+      S.s2Missions[s2Mission] = true;
+      S.skills.mirrorDraw++; S.skillTries.mirrorDraw++;
+      recordAnswer('s2','mirrorDraw', true, 's2-'+s2Mission);
+      fb(fE, 'ok', '🎨 آفرین! نیمه دیگر را با رنگ دلخواهت کشیدی.');
+      if(S.s2Missions.every(Boolean) && !S.completed.s2){
+        S.stageScores.s2 = 20; S.completed.s2 = true; S.badgeCount++;
+      }
+      saveState(); updateTopbar();
+    } else { fb(fE, 'ok', '✅ درست است!'); }
+    document.getElementById('s2Next').disabled = true;
+    window.setTimeout(function(){
+      celebrateStars();
+      const next = S.s2Missions.findIndex(function(done){ return !done; });
+      if(next >= 0){ s2Mission = next; initStage2(); fb(document.getElementById('s2Feedback'),'info','➡️ مرحله بعدی آماده است؛ نیمه قرینه را کامل کن.'); }
+      else { S.currentStage='s3'; saveState(); show('screen-s3'); updateTopbar(); initStage3(); fb(document.getElementById('s3Feedback'),'ok','🏆 آفرین! همه تمرین‌های تقارن دوقسمتی کامل شد. حالا تقارن شطرنجی را شروع کن.'); }
+    }, 1200);
+  } else {
+    Sound.wrong(); loseLife('s2-check');
+    S.skillTries.mirrorDraw++;
+    recordAnswer('s2','mirrorDraw', false, 's2-try');
+    if(score >= 0.25) fb(fE, 'info', '🌟 نزدیک شدی؛ گوشه‌ها و انحناها را دقیق‌تر دنبال کن و از پاکن برای اصلاح استفاده کن.');
+    else fb(fE, 'info', '💡 از لبه‌های نیمه چپ شروع کن و قرینه‌اش را بکش.');
+  }
+  saveState(); updateTopbar();
+});
+function sampleMirrorRight(m, w, h){
+  const pts = [];
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','0 0 400 400');
+  svg.style.position='absolute'; svg.style.width='1px'; svg.style.height='1px';
+  svg.style.opacity='0'; svg.style.pointerEvents='none';
+  const path = document.createElementNS(ns,'path');
+  path.setAttribute('d',m.halfPath); svg.appendChild(path); document.body.appendChild(svg);
+  try{
+    const total = path.getTotalLength();
+    const n = Math.max(60, Math.ceil(total/3));
+    for(let i=0;i<=n;i++){
+      const p = path.getPointAtLength(total*i/n);
+      if(p.x < 198) pts.push({x:w*(400-p.x)/400, y:h*p.y/400});
+    }
+  }catch(e){}
+  svg.remove();
+  return pts;
+}
+document.getElementById('s2Next').addEventListener('click', function(){
+  if(!S.s2Missions.every(Boolean)){ toast('ابتدا همه تمرین‌های تقارن دوقسمتی را به‌ترتیب کامل کن.'); return; }
+  Sound.click();
+  S.currentStage='s3'; saveState(); show('screen-s3'); updateTopbar(); initStage3();
+});
+window.addEventListener('resize', function(){ if(S.currentStage==='s2'){ resizeCanvas2(); redrawS2(); } });
+
+/* =========================================================
+   STAGE 3
+   ========================================================= */
+const S3_PALETTE = ['#e35b6d','#2e8bc0','#4caf7d','#ffb703','#8d6cc9','#f26d9c'];
+const S3_MISSIONS = [
+  {name:'کاشی ۱', rows:4, cols:4, axis:'v', pattern:[[1,0],[1,1],[2,2]]},
+  {name:'کاشی ۲', rows:4, cols:6, axis:'v', pattern:[[0,0],[0,1],[3,4],[1,2]]},
+  {name:'کاشی ۳', rows:5, cols:5, axis:'v', pattern:[[2,0],[2,1],[0,2],[4,2]]},
+  {name:'کاشی ۴', rows:4, cols:4, axis:'h', pattern:[[0,0],[0,3],[1,1]]},
+  {name:'کاشی سخت', rows:6, cols:6, axis:'v', pattern:[[0,0],[0,1],[0,2],[1,0],[1,1],[2,0],[2,1],[2,2],[3,0],[3,2]]}
+];
+let s3Mission = 0, s3Grid = [], s3Fixed = [], s3SelColor = S3_PALETTE[0], s3Help = false;
+
+function initStage3(){
+  const tabs = document.getElementById('s3Tabs'); if(!tabs) return;
+  const firstPending = S.s3Missions.findIndex(function(done){ return !done; });
+  if(firstPending >= 0) s3Mission = firstPending;
+  else s3Mission = S3_MISSIONS.length - 1;
+  tabs.innerHTML = '';
+  S3_MISSIONS.forEach(function(m,i){
+    const b = document.createElement('button');
+    b.className = 'mtab' + (i===s3Mission?' active':'') + (S.s3Missions[i]?' done':'');
+    b.textContent = (i+1);
+    b.disabled = i !== s3Mission;
+    tabs.appendChild(b);
+  });
+  const m = S3_MISSIONS[s3Mission];
+  s3Grid = []; s3Fixed = [];
+  for(let r=0;r<m.rows;r++){
+    const rowC=[], rowF=[];
+    for(let c=0;c<m.cols;c++){ rowC.push(null); rowF.push(false); }
+    s3Grid.push(rowC); s3Fixed.push(rowF);
+  }
+  m.pattern.forEach(function(pair){
+    const r = pair[0], c = pair[1];
+    let inFirst;
+    if(m.axis==='v') inFirst = c < Math.ceil(m.cols/2);
+    else inFirst = r < Math.ceil(m.rows/2);
+    if(inFirst){
+      s3Grid[r][c] = S3_PALETTE[(r+c) % S3_PALETTE.length];
+      s3Fixed[r][c] = true;
+    }
+  });
+  s3Help = false;
+  const hb = document.getElementById('s3HelpBtn'); if(hb) hb.textContent = '🧭 راهنما: خاموش';
+  const nx = document.getElementById('s3Next'); if(nx) nx.disabled = !S.s3Missions[s3Mission];
+  const fE = document.getElementById('s3Feedback'); if(fE) fE.classList.add('hidden');
+  buildS3Board();
+  buildS3Palette();
+}
+function buildS3Board(){
+  const m = S3_MISSIONS[s3Mission];
+  const wrap = document.getElementById('s3BoardWrap'); if(!wrap) return;
+  wrap.innerHTML = '';
+  const board = document.createElement('div');
+  board.className = 'grid-board';
+  board.style.gridTemplateColumns = 'repeat('+m.cols+',1fr)';
+  board.style.maxWidth = Math.min(460, m.cols*70)+'px';
+  for(let r=0;r<m.rows;r++) for(let c=0;c<m.cols;c++){
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (s3Fixed[r][c]?' fixed':'');
+    cell.dataset.r = r; cell.dataset.c = c;
+    if(s3Grid[r][c]) cell.style.background = s3Grid[r][c];
+    (function(rr,cc){ cell.addEventListener('click', function(){ onS3Cell(rr,cc); }); })(r,c);
+    board.appendChild(cell);
+  }
+  const ax = document.createElement('div');
+  ax.className = m.axis==='v' ? 'grid-axis-v' : 'grid-axis-h';
+  board.appendChild(ax);
+  wrap.appendChild(board);
+}
+function onS3Cell(r,c){
+  if(s3Fixed[r][c]){ toast('خانه بخشی از الگوی اولیه است.'); return; }
+  Sound.pop();
+  s3Grid[r][c] = (s3Grid[r][c]===s3SelColor) ? null : s3SelColor;
+  refreshS3();
+  if(s3Help){
+    const m = S3_MISSIONS[s3Mission];
+    let mr=r, mc=c;
+    if(m.axis==='v') mc = m.cols-1-c; else mr = m.rows-1-r;
+    if(!(mr===r && mc===c) && !s3Fixed[mr][mc]){
+      s3Grid[mr][mc] = s3Grid[r][c];
+      refreshS3();
+    }
+  }
+}
+function refreshS3(){
+  document.querySelectorAll('#s3BoardWrap .cell').forEach(function(cell){
+    const r=+cell.dataset.r, c=+cell.dataset.c;
+    cell.style.background = s3Grid[r][c] || '#fbfdff';
+    cell.classList.remove('wrong');
+  });
+}
+function buildS3Palette(){
+  const pal = document.getElementById('s3Palette'); if(!pal) return;
+  pal.innerHTML = '';
+  S3_PALETTE.forEach(function(col, i){
+    const b = document.createElement('button');
+    b.className = 'pal' + (i===0?' sel':'');
+    b.style.background = col;
+    b.addEventListener('click', function(){
+      Sound.click();
+      pal.querySelectorAll('.pal').forEach(function(x){ x.classList.remove('sel'); });
+      b.classList.add('sel'); s3SelColor = col;
+    });
+    pal.appendChild(b);
+  });
+}
+document.getElementById('s3HelpBtn').addEventListener('click', function(){
+  Sound.click(); s3Help = !s3Help;
+  document.getElementById('s3HelpBtn').textContent = '🧭 راهنما: ' + (s3Help?'روشن':'خاموش');
+});
+document.getElementById('s3Clear').addEventListener('click', function(){ Sound.click(); initStage3(); });
+document.getElementById('s3Hint').addEventListener('click', function(){
+  Sound.click(); S.stageStats.s3.hints++; saveState();
+  fb(document.getElementById('s3Feedback'),'info','💡 هر خانه‌ای که رنگ کنی، خانه متناظر در طرف دیگر هم همان رنگ باشد.');
+});
+document.getElementById('s3Check').addEventListener('click', function(){
+  const m = S3_MISSIONS[s3Mission];
+  S.stageStats.s3.tries++;
+  let correct = 0, wrong = 0;
+  for(let r=0;r<m.rows;r++) for(let c=0;c<m.cols;c++){
+    let mr=r, mc=c;
+    if(m.axis==='v') mc = m.cols-1-c; else mr = m.rows-1-r;
+    if(r<mr || (r===mr && c<=mc)){
+      const a = s3Grid[r][c], b = s3Grid[mr][mc];
+      if(a === b && a !== null) correct++;
+      else if(a !== b) wrong++;
+    }
+  }
+  const fE = document.getElementById('s3Feedback');
+  if(correct === 0){ Sound.wrong(); fb(fE, 'bad', '🎨 هنوز خانه‌ای قرینه رنگ نکرده‌ای.'); return; }
+  if(wrong === 0){
+    Sound.correct();
+    if(!S.s3Missions[s3Mission]){
+      S.s3Missions[s3Mission] = true;
+      S.skills.paircell++; S.skillTries.paircell++;
+      S.skills.twoway++; S.skillTries.twoway++;
+      recordAnswer('s3','paircell', true, 's3-'+s3Mission);
+      fb(fE, 'ok', '🎉 عالی! همه جفت‌ها قرینه‌اند.');
+      if(S.s3Missions.every(Boolean) && !S.completed.s3){
+        S.stageScores.s3 = 20; S.completed.s3 = true; S.badgeCount++;
+      }
+      saveState(); updateTopbar();
+    } else { fb(fE, 'ok', '✅ درست است!'); }
+    document.getElementById('s3Next').disabled = true;
+    window.setTimeout(function(){
+      celebrateStars();
+      const next = S.s3Missions.findIndex(function(done){ return !done; });
+      if(next >= 0){ s3Mission = next; initStage3(); fb(document.getElementById('s3Feedback'),'info','➡️ سطح بعدی شطرنجی آماده است؛ آن را کامل کن.'); }
+      else { S.currentStage='s4'; saveState(); show('screen-s4'); updateTopbar(); initStage4(); fb(document.getElementById('s4Feedback'),'ok','🏆 عالی! همه سطح‌های تقارن دوقسمتی را کامل کردی. حالا تقارن چهارقسمتی را شروع کن.'); }
+    }, 1200);
+  } else {
+    Sound.wrong(); loseLife('s3-check');
+    S.skillTries.paircell++;
+    recordAnswer('s3','paircell', false, 's3-try');
+    document.querySelectorAll('#s3BoardWrap .cell').forEach(function(cell){
+      const r=+cell.dataset.r, c=+cell.dataset.c;
+      let mr=r, mc=c;
+      if(m.axis==='v') mc = m.cols-1-c; else mr = m.rows-1-r;
+      if(s3Grid[r][c] !== s3Grid[mr][mc]) cell.classList.add('wrong');
+    });
+    fb(fE, 'info', '🔍 '+wrong+' جفت قرینه نیست. قرمزها را اصلاح کن.');
+  }
+  saveState(); updateTopbar();
+});
+document.getElementById('s3Next').addEventListener('click', function(){
+  if(!S.s3Missions.every(Boolean)){ toast('ابتدا همه سطح‌های شطرنجی را به‌ترتیب کامل کن.'); return; }
+  Sound.click();
+  S.currentStage='s4'; saveState(); show('screen-s4'); updateTopbar(); initStage4();
+});
+
+/* =========================================================
+   STAGE 4
+   ========================================================= */
+const S4_PALETTE = ['#e35b6d','#2e8bc0','#4caf7d','#ffb703','#8d6cc9','#f26d9c','#37b3a4','#ff7b00'];
+const S4_LEVELS = [
+  {name:'آسان', rows:4, cols:4, colors:4, pattern:[[0,0,'flower'],[0,1,'leaf'],[1,0,'bud']]},
+  {name:'متوسط', rows:6, cols:6, colors:5, pattern:[[0,0,'flower'],[0,1,'leaf'],[1,2,'star'],[2,0,'bud'],[1,0,'leaf']]},
+  {name:'سخت', rows:8, cols:8, colors:6, pattern:[[0,0,'flower'],[0,1,'leaf'],[1,2,'star'],[2,3,'bud'],[3,0,'leaf'],[1,1,'flower'],[2,2,'star']]},
+  {name:'پیشرفته', rows:10, cols:10, colors:8, pattern:[[0,0,'flower'],[0,1,'leaf'],[1,2,'star'],[2,3,'bud'],[3,4,'flower'],[4,0,'leaf'],[1,1,'star'],[2,2,'flower'],[3,3,'leaf'],[4,4,'bud'],[0,2,'star'],[2,0,'bud']]}
+];
+const S4_SHAPES = {
+  flower: function(color, size){
+    return '<svg viewBox="0 0 100 100" width="'+size+'" height="'+size+'"><circle cx="50" cy="50" r="12" fill="'+color+'"/><g fill="'+color+'" opacity="0.8"><ellipse cx="50" cy="30" rx="9" ry="16"/><ellipse cx="50" cy="70" rx="9" ry="16"/><ellipse cx="30" cy="50" rx="16" ry="9"/><ellipse cx="70" cy="50" rx="16" ry="9"/><ellipse cx="36" cy="36" rx="9" ry="16" transform="rotate(-45 36 36)"/><ellipse cx="64" cy="64" rx="9" ry="16" transform="rotate(-45 64 64)"/><ellipse cx="64" cy="36" rx="9" ry="16" transform="rotate(45 64 36)"/><ellipse cx="36" cy="64" rx="9" ry="16" transform="rotate(45 36 64)"/></g><circle cx="50" cy="50" r="6" fill="#ffb703"/></svg>';
+  },
+  leaf: function(color, size){
+    return '<svg viewBox="0 0 100 100" width="'+size+'" height="'+size+'"><path d="M50 15 Q75 50 50 85 Q25 50 50 15Z" fill="'+color+'" opacity="0.9"/><path d="M50 20 L50 80" stroke="#2d5a1e" stroke-width="3" opacity="0.5"/><path d="M50 40 L65 50 M50 55 L35 65" stroke="#2d5a1e" stroke-width="2" opacity="0.4"/></svg>';
+  },
+  star: function(color, size){
+    return '<svg viewBox="0 0 100 100" width="'+size+'" height="'+size+'"><path d="M50 10 L60 40 L92 40 L66 58 L76 88 L50 70 L24 88 L34 58 L8 40 L40 40 Z" fill="'+color+'"/><circle cx="50" cy="50" r="8" fill="#fff" opacity="0.4"/></svg>';
+  },
+  bud: function(color, size){
+    return '<svg viewBox="0 0 100 100" width="'+size+'" height="'+size+'"><ellipse cx="50" cy="55" rx="18" ry="25" fill="'+color+'"/><path d="M50 30 Q55 15 50 10 Q45 15 50 30Z" fill="#4caf7d"/><ellipse cx="50" cy="55" rx="8" ry="12" fill="#fff" opacity="0.3"/></svg>';
+  }
+};
+let s4Level = 0, s4Grid = [], s4Fixed = [], s4SelColor = S4_PALETTE[0], s4Help = false, s4SelShape = 'flower';
+
+function initStage4(){
+  const tabs = document.getElementById('s4Tabs'); if(!tabs) return;
+  const firstPending = S.s4Levels.findIndex(function(done){ return !done; });
+  if(firstPending >= 0) s4Level = firstPending;
+  else s4Level = S4_LEVELS.length - 1;
+  tabs.innerHTML = '';
+  S4_LEVELS.forEach(function(lv,i){
+    const b = document.createElement('button');
+    b.className = 'mtab' + (i===s4Level?' active':'') + (S.s4Levels[i]?' done':'');
+    b.textContent = (i+1) + ' ' + lv.name;
+    b.disabled = i !== s4Level;
+    tabs.appendChild(b);
+  });
+  const lv = S4_LEVELS[s4Level];
+  s4Grid = []; s4Fixed = [];
+  for(let r=0;r<lv.rows;r++){
+    const rowC=[], rowF=[];
+    for(let c=0;c<lv.cols;c++){ rowC.push(null); rowF.push(false); }
+    s4Grid.push(rowC); s4Fixed.push(rowF);
+  }
+  lv.pattern.forEach(function(p, i){
+    const r = p[0], c = p[1], shapeType = p[2];
+    if(r < Math.ceil(lv.rows/2) && c < Math.ceil(lv.cols/2)){
+      s4Grid[r][c] = {shape: shapeType, color: S4_PALETTE[i % lv.colors]};
+      s4Fixed[r][c] = true;
+    }
+  });
+  s4Help = false;
+  const hb = document.getElementById('s4HelpBtn'); if(hb) hb.textContent = '🧭 راهنما: خاموش';
+  const nx = document.getElementById('s4Next'); if(nx) nx.disabled = !S.s4Levels[s4Level];
+  const fE = document.getElementById('s4Feedback'); if(fE) fE.classList.add('hidden');
+  buildS4Board();
+  buildS4Palette();
+}
+function buildS4Board(){
+  const lv = S4_LEVELS[s4Level];
+  const wrap = document.getElementById('s4BoardWrap'); if(!wrap) return;
+  wrap.innerHTML = '';
+  const board = document.createElement('div');
+  board.className = 'grid-board';
+  board.style.gridTemplateColumns = 'repeat('+lv.cols+',1fr)';
+  board.style.maxWidth = Math.min(560, lv.cols*52)+'px';
+  const cellSize = Math.min(50, 560/lv.cols);
+  for(let r=0;r<lv.rows;r++) for(let c=0;c<lv.cols;c++){
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (s4Fixed[r][c]?' fixed':'');
+    cell.dataset.r = r; cell.dataset.c = c;
+    if(s4Grid[r][c]){
+      const item = s4Grid[r][c];
+      cell.innerHTML = S4_SHAPES[item.shape](item.color, cellSize);
+    }
+    (function(rr,cc){ cell.addEventListener('click', function(){ onS4Cell(rr,cc); }); })(r,c);
+    board.appendChild(cell);
+  }
+  const av = document.createElement('div'); av.className = 'grid-axis-v'; board.appendChild(av);
+  const ah = document.createElement('div'); ah.className = 'grid-axis-h'; board.appendChild(ah);
+  wrap.appendChild(board);
+}
+function onS4Cell(r,c){
+  if(s4Fixed[r][c]){ toast('خانه بخشی از الگوی مرجع است.'); return; }
+  Sound.pop();
+  s4Grid[r][c] = (s4Grid[r][c] && s4Grid[r][c].shape===s4SelShape && s4Grid[r][c].color===s4SelColor) ? null : {shape: s4SelShape, color: s4SelColor};
+  refreshS4();
+  if(s4Help){
+    const lv = S4_LEVELS[s4Level];
+    const mr = lv.rows-1-r, mc = lv.cols-1-c;
+    [[r,mc],[mr,c],[mr,mc]].forEach(function(t){
+      const rr=t[0], cc=t[1];
+      if(!(rr===r&&cc===c) && !s4Fixed[rr][cc]) s4Grid[rr][cc] = s4Grid[r][c];
+    });
+    refreshS4();
+  }
+}
+function refreshS4(){
+  const lv = S4_LEVELS[s4Level];
+  const cellSize = Math.min(50, 560/lv.cols);
+  document.querySelectorAll('#s4BoardWrap .cell').forEach(function(cell){
+    const r=+cell.dataset.r, c=+cell.dataset.c;
+    if(s4Grid[r][c]){
+      cell.innerHTML = S4_SHAPES[s4Grid[r][c].shape](s4Grid[r][c].color, cellSize);
+    } else { cell.innerHTML = ''; }
+    cell.classList.remove('wrong');
+  });
+}
+function buildS4Palette(){
+  const pal = document.getElementById('s4Palette'); if(!pal) return;
+  pal.innerHTML = '';
+  S4_PALETTE.forEach(function(col, i){
+    const b = document.createElement('button');
+    b.className = 'pal' + (i===0?' sel':'');
+    b.style.background = col;
+    b.addEventListener('click', function(){
+      Sound.click();
+      pal.querySelectorAll('.pal').forEach(function(x){ x.classList.remove('sel'); });
+      b.classList.add('sel'); s4SelColor = col;
+    });
+    pal.appendChild(b);
+  });
+  const shapeBar = document.createElement('div');
+  shapeBar.style.cssText = 'display:flex;gap:6px;justify-content:center;margin:6px 0;flex-wrap:wrap';
+  ['flower','leaf','star','bud'].forEach(function(sh, i){
+    const b = document.createElement('button');
+    b.className = 'tool-btn' + (i===0?' sel':'');
+    b.style.cssText = 'padding:4px 8px;font-size:0.8rem';
+    b.textContent = {flower:'🌸 گل', leaf:'🍃 برگ', star:'⭐ ستاره', bud:'🌱 جوانه'}[sh];
+    b.addEventListener('click', function(){
+      Sound.click();
+      shapeBar.querySelectorAll('.tool-btn').forEach(function(x){ x.classList.remove('sel'); });
+      b.classList.add('sel'); s4SelShape = sh;
+    });
+    shapeBar.appendChild(b);
+  });
+  pal.appendChild(shapeBar);
+}
+document.getElementById('s4HelpBtn').addEventListener('click', function(){
+  Sound.click(); s4Help = !s4Help;
+  document.getElementById('s4HelpBtn').textContent = '🧭 راهنما: ' + (s4Help?'روشن':'خاموش');
+});
+document.getElementById('s4Clear').addEventListener('click', function(){ Sound.click(); initStage4(); });
+document.getElementById('s4Hint').addEventListener('click', function(){
+  Sound.click(); S.stageStats.s4.hints++; saveState();
+  fb(document.getElementById('s4Feedback'),'info','💡 الگوی مرجع در بالا-چپ است. با دو خط تقارن سه ناحیه دیگر را کامل کن. از گل، برگ، ستاره و جوانه استفاده کن!');
+});
+function s4Same(a, b){
+  if(!a && !b) return true;
+  if(!a || !b) return false;
+  return a.shape === b.shape && a.color === b.color;
+}
+document.getElementById('s4Check').addEventListener('click', function(){
+  const lv = S4_LEVELS[s4Level];
+  S.stageStats.s4.tries++;
+  let correct = 0, wrong = 0;
+  for(let r=0;r<lv.rows;r++) for(let c=0;c<lv.cols;c++){
+    const mr = lv.rows-1-r, mc = lv.cols-1-c;
+    if(r<=mr && c<=mc){
+      const a = s4Grid[r][c], b = s4Grid[r][mc], d = s4Grid[mr][c], e = s4Grid[mr][mc];
+      if(s4Same(a,b) && s4Same(a,d) && s4Same(a,e)) correct++;
+      else if(!s4Same(a,b) || !s4Same(a,d) || !s4Same(a,e)) wrong++;
+    }
+  }
+  const fE = document.getElementById('s4Feedback');
+  if(correct === 0 && wrong === 0){ Sound.wrong(); fb(fE, 'bad', 'هنوز نقشی نگذاشته‌ای.'); return; }
+  if(wrong === 0 && correct > 0){
+    Sound.correct();
+    if(!S.s4Levels[s4Level]){
+      S.s4Levels[s4Level] = true;
+      S.skills.fourway++; S.skillTries.fourway++;
+      S.skills.colorpattern++; S.skillTries.colorpattern++;
+      recordAnswer('s4','fourway', true, 's4-'+s4Level);
+      fb(fE, 'ok', '🎉 آفرین! سطح «'+lv.name+'» درست شد.');
+      if(S.s4Levels.every(Boolean) && !S.completed.s4){
+        S.stageScores.s4 = 20; S.completed.s4 = true; S.badgeCount++;
+      }
+      saveState(); updateTopbar();
+    } else { fb(fE, 'ok', '✅ درست است!'); }
+    document.getElementById('s4Next').disabled = true;
+    window.setTimeout(function(){
+      celebrateStars();
+      const next = S.s4Levels.findIndex(function(done){ return !done; });
+      if(next >= 0){ s4Level = next; initStage4(); fb(document.getElementById('s4Feedback'),'info','➡️ سطح بعدی تقارن چهارقسمتی آماده است؛ آن را کامل کن.'); }
+      else { S.currentStage='s5'; saveState(); show('screen-s5'); updateTopbar(); initStage5(); fb(document.getElementById('s5Feedback'),'ok','🏆 آفرین! هر چهار سطح تقارن چهارقسمتی را کامل کردی. حالا وارد مرحله بعدی بازی شو.'); }
+    }, 1200);
+  } else {
+    Sound.wrong(); loseLife('s4-check');
+    S.skillTries.fourway++;
+    recordAnswer('s4','fourway', false, 's4-try');
+    document.querySelectorAll('#s4BoardWrap .cell').forEach(function(cell){
+      const r=+cell.dataset.r, c=+cell.dataset.c;
+      const mr=lv.rows-1-r, mc=lv.cols-1-c;
+      if(r<=mr && c<=mc){
+        const a=s4Grid[r][c], b=s4Grid[r][mc], d=s4Grid[mr][c], e=s4Grid[mr][mc];
+        if(!s4Same(a,b)||!s4Same(a,d)||!s4Same(a,e)) cell.classList.add('wrong');
+      }
+    });
+    fb(fE, 'info', '🔍 '+wrong+' گروه قرینه نیست. قرمزها را اصلاح کن.');
+  }
+  saveState(); updateTopbar();
+});
+document.getElementById('s4Next').addEventListener('click', function(){
+  if(!S.s4Levels.every(Boolean)){ toast('ابتدا هر چهار سطح تقارن چهارقسمتی را به‌ترتیب کامل کن.'); return; }
+  Sound.click();
+  S.currentStage='s5'; saveState(); show('screen-s5'); updateTopbar(); initStage5();
+});
+
+/* =========================================================
+   STAGE 5
+   ========================================================= */
+const S5_QUESTIONS = [
+  {type:'v', side:3, icon:'■', color:'#2e8bc0', q:'در سمت چپ ۳ مربع است. طرف راست قرینه است. در مجموع چند مربع داریم؟', correct:6, opts:[3,6,9,12], explain:'۲ × ۳ = ۶ مربع.'},
+  {type:'v', side:5, icon:'●', color:'#ffb703', q:'در یک طرف ۵ دایره است. با تقارن، مجموع چند دایره؟', correct:10, opts:[5,8,10,15], explain:'۵ + ۵ = ۱۰.'},
+  {type:'v', side:7, icon:'★', color:'#f26d9c', q:'در یک طرف ۷ ستاره است. قرینه دارد. کل چند ستاره؟', correct:14, opts:[7,10,14,21], explain:'۷ + ۷ = ۱۴.'},
+  {type:'four', side:2, icon:'▲', color:'#4caf7d', q:'در یک ناحیه ۲ مثلث است. تقارن چهارقسمتی برقرار است. در کل چند مثلث؟', correct:8, opts:[2,4,6,8], explain:'۴ × ۲ = ۸.'},
+  {type:'four', side:3, icon:'◆', color:'#8d6cc9', q:'در یک ناحیه ۳ لوزی است. با تقارن چهارقسمتی، مجموع چند لوزی؟', correct:12, opts:[6,9,12,15], explain:'۴ × ۳ = ۱۲.'},
+  {type:'four', side:4, icon:'♥', color:'#e35b6d', q:'در یک ناحیه ۴ قلب است. با تقارن چهارقسمتی، مجموع چند قلب؟', correct:16, opts:[4,8,12,16], explain:'۴ × ۴ = ۱۶.'},
+  {type:'v', side:9, icon:'✿', color:'#8d6cc9', q:'در یک طرف ۹ گل است. طرف دیگر قرینه. در کل چند گل؟', correct:18, opts:[9,14,18,20], explain:'۹ + ۹ = ۱۸.'},
+  {type:'four', side:5, icon:'■', color:'#2e8bc0', q:'در یک ناحیه ۵ مربع است. با تقارن چهارقسمتی، مجموع چند مربع؟', correct:20, opts:[5,10,15,20], explain:'۴ × ۵ = ۲۰.'}
+];
+let s5Order = [], s5Index = 0, s5CorrectCount = 0;
+
+function initStage5(){
+  s5Order = S5_QUESTIONS.slice().sort(function(){ return Math.random()-0.5; }).slice(0,8);
+  s5Index = 0; s5CorrectCount = 0;
+  renderS5();
+}
+function renderS5(){
+  const q = s5Order[s5Index];
+  const counter = document.getElementById('s5Counter'); if(counter) counter.textContent = 'سؤال '+(s5Index+1)+' از '+s5Order.length;
+  const qEl = document.getElementById('s5Question'); if(qEl) qEl.textContent = q.q;
+  const W = 460, H = 220;
+  const parts = ['<svg viewBox="0 0 '+W+' '+H+'" style="display:block;width:100%;height:auto">'];
+  if(q.type === 'v'){
+    parts.push('<rect x="20" y="20" width="'+(W-40)+'" height="'+(H-40)+'" fill="#f4faff" stroke="#cfe3f0" rx="10"/>');
+    parts.push('<line x1="'+(W/2)+'" y1="20" x2="'+(W/2)+'" y2="'+(H-20)+'" class="sym-axis"/>');
+    let placed = 0;
+    const perRow = 3;
+    const rows = Math.ceil(q.side / perRow);
+    for(let r=0;r<rows && placed<q.side;r++){
+      const inThisRow = Math.min(perRow, q.side - placed);
+      const startX = W/4 - ((inThisRow-1)*30)/2;
+      for(let c=0;c<inThisRow;c++){
+        parts.push('<text x="'+(startX + c*30)+'" y="'+(70 + r*40)+'" font-size="22" fill="'+q.color+'" text-anchor="middle">'+q.icon+'</text>');
+        placed++;
+      }
+    }
+    parts.push('<rect x="'+(W/2+10)+'" y="30" width="'+(W/2-30)+'" height="'+(H-60)+'" fill="none" stroke="#8d6cc9" stroke-dasharray="4 6" opacity=".3" rx="6"/>');
+    parts.push('<text x="'+(W*0.75)+'" y="'+(H/2)+'" font-size="13" fill="#8d6cc9" text-anchor="middle" opacity=".6">خالی (قرینه)</text>');
+  } else {
+    parts.push('<rect x="30" y="20" width="'+(W-60)+'" height="'+(H-40)+'" fill="#f4faff" stroke="#cfe3f0" rx="10"/>');
+    parts.push('<line x1="'+(W/2)+'" y1="20" x2="'+(W/2)+'" y2="'+(H-20)+'" class="sym-axis"/>');
+    parts.push('<line x1="30" y1="'+(H/2)+'" x2="'+(W-30)+'" y2="'+(H/2)+'" class="sym-axis-2"/>');
+    let placed = 0;
+    const perRow = 2;
+    const rows = Math.ceil(q.side / perRow);
+    for(let r=0;r<rows && placed<q.side;r++){
+      const inThisRow = Math.min(perRow, q.side - placed);
+      const startX = W/4 - ((inThisRow-1)*30)/2;
+      for(let c=0;c<inThisRow;c++){
+        parts.push('<text x="'+(startX + c*30)+'" y="'+(55 + r*28)+'" font-size="18" fill="'+q.color+'" text-anchor="middle">'+q.icon+'</text>');
+        placed++;
+      }
+    }
+    const boxes = [
+      {x: W/2+30, y: 30, w: W/2-60, h: H/2-50},
+      {x: 40, y: H/2+10, w: W/2-50, h: H/2-40},
+      {x: W/2+30, y: H/2+10, w: W/2-60, h: H/2-40}
+    ];
+    boxes.forEach(function(b){
+      parts.push('<rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" fill="none" stroke="#8d6cc9" stroke-dasharray="4 6" opacity=".3" rx="6"/>');
+      parts.push('<text x="'+(b.x+b.w/2)+'" y="'+(b.y+b.h/2+4)+'" font-size="11" fill="#8d6cc9" text-anchor="middle" opacity=".6">خالی</text>');
+    });
+  }
+  parts.push('</svg>');
+  const scene = document.getElementById('s5Scene'); if(scene) scene.innerHTML = parts.join('');
+  const ansBox = document.getElementById('s5Answers'); if(!ansBox) return;
+  ansBox.innerHTML = '';
+  let answered = false;
+  q.opts.forEach(function(o){
+    const b = document.createElement('button'); b.className='ans'; b.textContent = o;
+    b.addEventListener('click', function(){
+      if(answered) return; answered = true;
+      S.stageStats.s5.tries++;
+      const ok = o === q.correct;
+      b.classList.add(ok?'good':'bad');
+      Array.prototype.forEach.call(ansBox.children, function(ch, ii){ if(q.opts[ii] === q.correct) ch.classList.add('good'); });
+      if(ok){
+        Sound.correct();
+        s5CorrectCount++;
+        S.skills.counting++; S.skillTries.counting++;
+        recordAnswer('s5','counting', true, 's5-'+s5Index);
+        fb(document.getElementById('s5Feedback'),'ok','✅ '+q.explain);
+      } else {
+        Sound.wrong(); loseLife('s5-'+s5Index);
+        S.skillTries.counting++;
+        recordAnswer('s5','counting', false, 's5-'+s5Index);
+        fb(document.getElementById('s5Feedback'),'bad','❌ دقت کن: '+q.explain);
+      }
+      const nx = document.getElementById('s5Next');
+      if(nx){ nx.disabled = false; nx.textContent = (s5Index<s5Order.length-1)?'سؤال بعد ➜':'پایان این مأموریت ➜'; }
+    });
+    ansBox.appendChild(b);
+  });
+  const nx = document.getElementById('s5Next'); if(nx) nx.disabled = true;
+  const fE = document.getElementById('s5Feedback'); if(fE) fE.classList.add('hidden');
+}
+document.getElementById('s5Hint').addEventListener('click', function(){
+  Sound.click(); S.stageStats.s5.hints++; saveState();
+  fb(document.getElementById('s5Feedback'),'info','💡 در دوقسمتی ×۲، در چهارقسمتی ×۴.');
+});
+document.getElementById('s5Next').addEventListener('click', function(){
+  if(s5Index < s5Order.length-1){ if(s5CorrectCount >= s5Index+1) celebrateStars(); s5Index++; renderS5(); window.scrollTo(0,0); }
+  else {
+    if(!S.completed.s5){
+      const pct = s5CorrectCount / s5Order.length;
+      S.stageScores.s5 = Math.round(pct * 20);
+      S.completed.s5 = true; S.badgeCount++;
+      saveState();
+    }
+    celebrateStars();
+    Sound.win();
+    S.currentStage='s6'; saveState(); updateTopbar();
+    show('screen-s6'); initStage6();
+  }
+});
+
+/* =========================================================
+   STAGE 6
+   ========================================================= */
+const S6_SHAPES = [
+  {name:'پروانه', color:'#f26d9c', svg:'<path d="M50 30 C25 0 10 40 50 55 C90 40 75 0 50 30Z" fill="#f26d9c"/><path d="M50 55 C35 70 30 90 50 85 C70 90 65 70 50 55Z" fill="#f9b3cc"/><ellipse cx="50" cy="57" rx="2" ry="12" fill="#1f3a4d"/>'},
+  {name:'قلب', color:'#e35b6d', svg:'<path d="M50 90 C10 55 10 20 50 30 C90 20 90 55 50 90Z" fill="#e35b6d"/>'},
+  {name:'گل', color:'#8d6cc9', svg:'<g fill="#8d6cc9"><ellipse cx="50" cy="29" rx="12" ry="20"/><ellipse cx="50" cy="71" rx="12" ry="20"/><ellipse cx="29" cy="50" rx="20" ry="12"/><ellipse cx="71" cy="50" rx="20" ry="12"/></g><circle cx="50" cy="50" r="11" fill="#ffb703"/>'},
+  {name:'مربع', color:'#2e8bc0', svg:'<rect x="20" y="20" width="60" height="60" fill="#2e8bc0" rx="3"/>'},
+  {name:'لوزی', color:'#4caf7d', svg:'<path d="M50 15 L85 50 L50 85 L15 50 Z" fill="#4caf7d"/>'},
+  {name:'دایره', color:'#ffb703', svg:'<circle cx="50" cy="50" r="34" fill="#ffb703"/>'},
+  {name:'ستاره', color:'#f26d9c', svg:'<path d="M50 12 L60 39 L89 40 L66 58 L74 86 L50 70 L26 86 L34 58 L11 40 L40 39 Z" fill="#f26d9c"/>'},
+  {name:'مثلث', color:'#2e8bc0', svg:'<path d="M50 15 L86 82 L14 82 Z" fill="#2e8bc0"/>'}
+];
+let s6ShapeIdx = 0, s6CutX = 0.5, s6SplitDone = false, s6Pieces = [], s6Solved = false;
+let s6PenCtx=null, s6PenDrawing=false, s6PenPoints=[], s6AxisApproved=false;
+
+function initStage6(){
+  const tabs = document.getElementById('s6Tabs'); if(!tabs) return;
+  tabs.innerHTML = '';
+  S6_SHAPES.forEach(function(sh, i){
+    const b = document.createElement('button');
+    b.className = 'mtab' + (i===s6ShapeIdx?' active':'');
+    b.textContent = sh.name;
+    b.addEventListener('click', function(){ Sound.click(); s6ShapeIdx = i; initStage6(); });
+    tabs.appendChild(b);
+  });
+  s6CutX = 0.5; s6SplitDone = false; s6Pieces = []; s6Solved = false;
+  buildS6Room();
+  setupS6PenCanvas();
+  s6AxisApproved = false;
+  const splitBtn = document.getElementById('s6Split'); if(splitBtn) splitBtn.disabled = true;
+  const cut = document.getElementById('s6Cut');
+  if(cut){
+    cut.style.left = '50%';
+    cut.classList.remove('locked');
+    cut.classList.remove('hidden');
+    cut._bound = false;
+  }
+  const nx = document.getElementById('s6Next'); if(nx) nx.disabled = !S.completed.s6;
+  const fE = document.getElementById('s6Feedback'); if(fE) fE.classList.add('hidden');
+  const hint = document.getElementById('s6Hint');
+  if(hint) hint.className = 'feedback info small';
+  bindS6CutDrag();
+  updateS6SplitBtn();
+}
+function buildS6Room(){
+  const room = document.getElementById('s6Room'); if(!room) return;
+  room.querySelectorAll('.piece3d').forEach(function(el){ el.remove(); });
+  const sh = S6_SHAPES[s6ShapeIdx];
+  const W = room.clientWidth || 400;
+  const H = room.clientHeight || 400;
+  const fullEl = document.createElement('div');
+  fullEl.className = 'piece3d';
+  fullEl.id = 's6Full';
+  fullEl.style.cssText = 'width:'+W+'px;height:'+H+'px;left:0;top:0;pointer-events:none;z-index:2';
+  fullEl.innerHTML = '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">'+sh.svg+'</svg>';
+  room.appendChild(fullEl);
+  s6Pieces = [{el:fullEl, isFull:true}];
+}
+function setupS6PenCanvas(){
+  const canvas=document.getElementById('s6PenCanvas'); if(!canvas) return;
+  const room=document.getElementById('s6Room'); const r=room.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=Math.max(1,Math.floor(r.width*dpr)); canvas.height=Math.max(1,Math.floor(r.height*dpr));
+  canvas.style.width=r.width+'px'; canvas.style.height=r.height+'px';
+  s6PenCtx=canvas.getContext('2d'); s6PenCtx.setTransform(dpr,0,0,dpr,0,0);
+  s6PenPoints=[]; canvas.classList.remove('disabled');
+  canvas.onpointerdown=function(e){ if(s6AxisApproved||s6SplitDone) return; e.preventDefault(); try{canvas.setPointerCapture(e.pointerId)}catch(err){}; const b=canvas.getBoundingClientRect(); s6PenDrawing=true; s6PenPoints.push({x:e.clientX-b.left,y:e.clientY-b.top}); drawS6Pen(); };
+  canvas.onpointermove=function(e){ if(!s6PenDrawing) return; e.preventDefault(); const b=canvas.getBoundingClientRect(); s6PenPoints.push({x:e.clientX-b.left,y:e.clientY-b.top}); drawS6Pen(); };
+  const end=function(){s6PenDrawing=false}; canvas.onpointerup=end; canvas.onpointercancel=end;
+  const pen=document.getElementById('s6Pen'); if(pen) pen.onclick=function(){ Sound.click(); if(!s6AxisApproved&&!s6SplitDone) canvas.classList.remove('disabled'); };
+  const clear=document.getElementById('s6ClearLine'); if(clear) clear.onclick=function(){ Sound.click(); if(s6SplitDone)return; s6AxisApproved=false; s6PenPoints=[]; drawS6Pen(); canvas.classList.remove('disabled'); const b=document.getElementById('s6CheckLine'); if(b)b.disabled=false; const sp=document.getElementById('s6Split');if(sp)sp.disabled=true; const cut=document.getElementById('s6Cut'); if(cut){cut.classList.remove('locked');cut.style.left='50%';s6CutX=.5;} fb(document.getElementById('s6Feedback'),'info','خط پاک شد؛ دوباره خط تقارن را بکش.'); };
+  const check=document.getElementById('s6CheckLine'); if(check) check.onclick=checkS6Axis;
+  drawS6Pen();
+}
+function drawS6Pen(){
+  if(!s6PenCtx)return; const c=document.getElementById('s6PenCanvas'); const r=c.getBoundingClientRect();
+  s6PenCtx.clearRect(0,0,r.width,r.height); if(s6PenPoints.length<1)return;
+  s6PenCtx.strokeStyle='#1769aa'; s6PenCtx.lineWidth=4; s6PenCtx.lineCap='round'; s6PenCtx.lineJoin='round'; s6PenCtx.beginPath(); s6PenCtx.moveTo(s6PenPoints[0].x,s6PenPoints[0].y);
+  for(let i=1;i<s6PenPoints.length;i++)s6PenCtx.lineTo(s6PenPoints[i].x,s6PenPoints[i].y); s6PenCtx.stroke();
+}
+function checkS6Axis(){
+  const f=document.getElementById('s6Feedback'), c=document.getElementById('s6PenCanvas');
+  if(s6PenPoints.length<8){ Sound.wrong(); loseLife('s6-axis-empty'); fb(f,'bad','✏️ خط را با قلم بکش و از بخش بالایی شکل تا بخش پایینی آن ادامه بده.'); return; }
+  const xs=s6PenPoints.map(p=>p.x), ys=s6PenPoints.map(p=>p.y), w=c.getBoundingClientRect().width, h=c.getBoundingClientRect().height;
+  const avg=xs.reduce((a,b)=>a+b,0)/xs.length, minY=Math.min(...ys), maxY=Math.max(...ys), minX=Math.min(...xs), maxX=Math.max(...xs);
+  const yCoverage=(maxY-minY)/h, xDrift=(maxX-minX)/w, centerError=Math.abs(avg-w*.5)/w;
+  if(yCoverage<.35 || xDrift>.30 || centerError>.15){
+    Sound.wrong(); loseLife('s6-axis');
+    S.stageStats.s6.tries++; S.skillTries.cut3d++; recordAnswer('s6','cut3d',false,'s6-axis-try'); saveState();
+    let msg='🔎 خط تقارن باید تقریباً عمودی و نزدیک وسط شکل باشد. ';
+    if(yCoverage<.35)msg+='آن را از نزدیک بالای شکل تا نزدیک پایین شکل بکش. ';
+    if(xDrift>.30)msg+='سعی کن خط کمتر به چپ و راست خم شود. ';
+    if(centerError>.15)msg+='خط را به وسط شکل نزدیک‌تر کن.';
+    fb(f,'bad',msg);return;
+  }
+  Sound.correct();
+  s6AxisApproved=true; s6CutX=avg/w; const cut=document.getElementById('s6Cut'); cut.style.left=(s6CutX*100)+'%'; cut.classList.remove('locked');
+  c.classList.add('disabled'); const sp=document.getElementById('s6Split');if(sp)sp.disabled=false;
+  const check=document.getElementById('s6CheckLine');if(check)check.disabled=true;
+  fb(f,'ok','🌟 خط تقارن را مشخص کردی! خط سبز روی همان محل قرار گرفت؛ حالا می‌توانی برش بزنی.');
+}
+function bindS6CutDrag(){
+  const cut = document.getElementById('s6Cut'); if(!cut || cut._bound) return;
+  cut._bound = true;
+  let drag = null;
+  cut.addEventListener('pointerdown', function(e){
+    if(s6SplitDone) return;
+    e.preventDefault();
+    try{ cut.setPointerCapture(e.pointerId); }catch(err){}
+    drag = true;
+  });
+  cut.addEventListener('pointermove', function(e){
+    if(!drag) return;
+    const room = document.getElementById('s6Room');
+    const r = room.getBoundingClientRect();
+    let pct = (e.clientX - r.left) / r.width;
+    pct = Math.max(0.15, Math.min(0.85, pct));
+    s6CutX = pct;
+    cut.style.left = (pct*100)+'%';
+  });
+  function end(){ drag = null; }
+  cut.addEventListener('pointerup', end);
+  cut.addEventListener('pointercancel', end);
+}
+function updateS6SplitBtn(){
+  const btn = document.getElementById('s6Split'); if(!btn) return;
+  btn.textContent = s6SplitDone ? '↺ ادغام مجدد' : '✂️ برش';
+}
+document.getElementById('s6Split').addEventListener('click', function(){
+  if(!s6SplitDone){
+    if(!s6AxisApproved){ fb(document.getElementById('s6Feedback'),'info','ابتدا با قلم خط تقارن را بکش و «بررسی خط تقارن» را بزن.'); return; }
+    if(Math.abs(s6CutX - 0.5) > 0.10){
+      Sound.wrong(); loseLife('s6-bad-cut');
+      S.stageStats.s6.tries++; S.skillTries.cut3d++;
+      recordAnswer('s6','cut3d', false, 's6-bad-cut');
+      fb(document.getElementById('s6Feedback'), 'bad', '💡 خط سبز را روی خط تقارن و دقیقاً وسط شکل قرار بده؛ برش از روی همین خط انجام می‌شود.');
+      return;
+    }
+    Sound.cut(); doS6Split();
+  } else { Sound.click(); doS6Merge(); }
+});
+function doS6Split(){
+  const room = document.getElementById('s6Room');
+  const sh = S6_SHAPES[s6ShapeIdx];
+  const W = room.clientWidth || 400;
+  const H = room.clientHeight || 400;
+  const full = document.getElementById('s6Full');
+  if(full) full.remove();
+  const cutPct = s6CutX * 100;
+  const leftSvg = '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%"><defs><clipPath id="s6clipL"><rect x="0" y="0" width="'+cutPct+'" height="100"/></clipPath></defs><g clip-path="url(#s6clipL)">'+sh.svg+'</g></svg>';
+  const rightSvg = '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%"><defs><clipPath id="s6clipR"><rect x="'+cutPct+'" y="0" width="'+(100-cutPct)+'" height="100"/></clipPath></defs><g clip-path="url(#s6clipR)">'+sh.svg+'</g></svg>';
+  const leftEl = document.createElement('div');
+  leftEl.className = 'piece3d';
+  leftEl.style.cssText = 'width:'+W+'px;height:'+H+'px;left:0;top:0;pointer-events:auto;z-index:5;clip-path:inset(0 '+(100-cutPct)+'% 0 0)';
+  leftEl.innerHTML = leftSvg;
+  room.appendChild(leftEl);
+  const rightEl = document.createElement('div');
+  rightEl.className = 'piece3d';
+  rightEl.style.cssText = 'width:'+W+'px;height:'+H+'px;left:0;top:0;pointer-events:auto;z-index:5;clip-path:inset(0 0 0 '+cutPct+'%)';
+  rightEl.innerHTML = rightSvg;
+  room.appendChild(rightEl);
+  s6Pieces = [
+    {el:leftEl, x:0, y:0, baseX:0, baseY:0},
+    {el:rightEl, x:0, y:0, baseX:0, baseY:0}
+  ];
+  s6Pieces.forEach(function(p){
+    let drag = null;
+    p.el.addEventListener('pointerdown', function(e){
+      if(s6Solved) return;
+      e.preventDefault(); e.stopPropagation();
+      try{ p.el.setPointerCapture(e.pointerId); }catch(err){}
+      drag = {sx:e.clientX, sy:e.clientY, ox:p.x, oy:p.y};
+      p.el.classList.add('moving');
+    });
+    p.el.addEventListener('pointermove', function(e){
+      if(!drag) return;
+      p.x = drag.ox + (e.clientX - drag.sx);
+      p.y = drag.oy + (e.clientY - drag.sy);
+      p.el.style.left = p.x+'px';
+      p.el.style.top = p.y+'px';
+    });
+    function end(){ drag = null; p.el.classList.remove('moving'); }
+    p.el.addEventListener('pointerup', end);
+    p.el.addEventListener('pointercancel', end);
+  });
+  s6SplitDone = true;
+  const penCanvas=document.getElementById('s6PenCanvas'); if(penCanvas){penCanvas.classList.add('disabled'); penCanvas.style.zIndex='1';}
+  document.getElementById('s6Cut').classList.add('locked');
+  updateS6SplitBtn();
+  S.stageStats.s6.tries++;
+  S.skills.cut3d++; S.skillTries.cut3d++;
+  recordAnswer('s6','cut3d', true, 's6-good-cut');
+  fb(document.getElementById('s6Feedback'), 'ok', '✂️ برش انجام شد! حالا دو نیمه را جابه‌جا کن و دوباره به هم بچسبان.');
+  const hint = document.getElementById('s6Hint');
+  if(hint) hint.textContent = '💡 هر نیمه را بگیر و کمی دور کن. سپس دوباره روی هم بگذار و «بررسی اتصال» را بزن.';
+}
+function doS6Merge(){
+  const room = document.getElementById('s6Room');
+  s6Pieces.forEach(function(p){ if(p.el) p.el.remove(); });
+  s6SplitDone = false;
+  s6Solved = false;
+  s6Pieces = [];
+  buildS6Room();
+  s6AxisApproved=false; setupS6PenCanvas();
+  const sp=document.getElementById('s6Split');if(sp)sp.disabled=true;
+  const chk=document.getElementById('s6CheckLine');if(chk)chk.disabled=false;
+  document.getElementById('s6Cut').classList.remove('locked');
+  updateS6SplitBtn();
+}
+document.getElementById('s6Check').addEventListener('click', function(){
+  if(!s6SplitDone || s6Pieces.length < 2){
+    fb(document.getElementById('s6Feedback'), 'info', 'ابتدا خط برش را وسط تنظیم کن و «برش» را بزن.');
+    return;
+  }
+  S.stageStats.s6.tries++;
+  const pl = s6Pieces[0], pr = s6Pieces[1];
+  const gapX = Math.abs(pr.x - pl.x);
+  const gapY = Math.abs(pr.y - pl.y);
+  const ok = gapX < 22 && gapY < 22;
+  const fE = document.getElementById('s6Feedback');
+  if(ok){
+    Sound.correct();
+    s6Solved = true;
+    if(!S.completed.s6){
+      S.stageScores.s6 = 20; S.completed.s6 = true; S.badgeCount++;
+      S.skills.halfmatch++; S.skillTries.halfmatch++;
+      recordAnswer('s6','cut3d', true, 's6-solved');
+      fb(fE, 'ok', '🎉 آفرین! قطعات دوباره به هم چسبیدند. +۲۰ امتیاز');
+      document.getElementById('s6Next').disabled = false;
+    } else {
+      fb(fE, 'ok', '✅ اتصال درست است.');
+      document.getElementById('s6Next').disabled = false;
+    }
+    saveState(); updateTopbar();
+  } else {
+    Sound.wrong(); loseLife('s6-merge');
+    recordAnswer('s6','cut3d', false, 's6-merge-try');
+    let msg = '🔍 اتصال کامل نیست. ';
+    if(gapX >= 22) msg += 'دو نیمه باید کاملاً روی هم منطبق شوند. ';
+    if(gapY >= 22) msg += 'ارتفاع باید یکسان باشد. ';
+    fb(fE, 'info', msg);
+  }
+});
+document.getElementById('s6Next').addEventListener('click', function(){
+  if(S.completed.s6) celebrateStars();
+  Sound.win();
+  S.currentStage='report'; saveState(); show('screen-report'); updateTopbar(); renderReport();
+});
+
+/* REPORT */
+function renderReport(){
+  const name = ((S.student.first||'')+' '+(S.student.last||'')).trim() || 'دانش‌آموز';
+  const total = totalScore();
+  let totalQ=0, totalCorrect=0, totalWrong=0, totalTries=0, totalHints=0;
+  for(const k in S.stageStats){
+    totalQ += S.stageStats[k].q; totalCorrect += S.stageStats[k].correct;
+    totalWrong += S.stageStats[k].wrong; totalTries += S.stageStats[k].tries;
+    totalHints += S.stageStats[k].hints;
+  }
+  const durMs = S.startTs ? (Date.now()-S.startTs) : 0;
+  const durMin = Math.floor(durMs/60000), durSec = Math.floor((durMs%60000)/1000);
+  const stages = [
+    {k:'s1', name:'آزمایشگاه آینه'}, {k:'s2', name:'نیمه گمشده'},
+    {k:'s3', name:'نقاش آینه‌ای'}, {k:'s4', name:'فرش چهارقسمتی'},
+    {k:'s5', name:'کارآگاه شمارش'}, {k:'s6', name:'کارگاه سه‌بعدی'}
+  ];
+  const skillNames = {
+    axis:'تشخیص خط تقارن', symshape:'تشخیص شکل متقارن',
+    halfmatch:'جدا/اتصال نیمه‌ها', mirrorDraw:'تکمیل نیمه با نقاشی',
+    paircell:'شناخت خانه‌های متناظر', twoway:'تقارن دوقسمتی',
+    fourway:'تقارن چهارقسمتی', colorpattern:'تقارن رنگ‌ها',
+    counting:'شمارش با تقارن', cut3d:'برش سه‌بعدی'
+  };
+  function stat(k){
+    const t = S.skillTries[k]||0, c = S.skills[k]||0;
+    if(!t) return {label:'ارزیابی‌نشده', cls:'na'};
+    const r = c/t;
+    if(r>=0.7) return {label:'تسلط خوب', cls:'good'};
+    if(r>=0.4) return {label:'در حال یادگیری', cls:'mid'};
+    return {label:'نیازمند تمرین', cls:'low'};
+  }
+  const strengths=[], weaknesses=[];
+  Object.keys(skillNames).forEach(function(k){
+    const st=stat(k);
+    if(st.cls==='good') strengths.push(skillNames[k]);
+    if(st.cls==='low'||st.cls==='mid') weaknesses.push(skillNames[k]);
+  });
+  const rows = stages.map(function(st){
+    const d = S.stageStats[st.k];
+    const score = S.stageScores[st.k] || 0;
+    const pctS = d.q ? Math.round(d.correct/d.q*100) : 0;
+    return '<tr><td>'+st.name+'</td><td>'+d.q+'</td><td>'+d.correct+'</td><td>'+d.wrong+'</td><td>'+pctS+'%</td><td>'+d.tries+'</td><td>'+score+' / 20</td><td>'+(S.completed[st.k]?'✅':'⏳')+'</td></tr>';
+  }).join('');
+  const skillHTML = Object.keys(skillNames).map(function(k){
+    const st = stat(k);
+    return '<div class="skill-row"><span>'+skillNames[k]+'</span><span class="badge '+st.cls+'">'+st.label+'</span></div>';
+  }).join('');
+  const livesInfo = '<div class="row" style="justify-content:center;margin:10px 0"><span class="badge '+(S.lives>=4?'good':(S.lives>=2?'mid':'low'))+'">جان باقی‌مانده: '+S.lives+' از '+(S.maxLives||6)+'</span></div>';
+  document.getElementById('reportContent').innerHTML =
+    '<div style="text-align:center;margin-bottom:12px">' +
+      '<div style="font-size:1.15rem;font-weight:900;color:var(--blue-d)">'+name+'</div>' +
+      '<div class="muted small">ریاضی سوم دبستان؛ فصل اول، الگوهای متقارن</div>' +
+      '<div class="muted small">تاریخ: '+(S.startedAt||'—')+'</div>' +
+    '</div>' +
+    livesInfo +
+    '<div class="score-big">'+total+' / 120</div>' +
+    '<p class="center muted">درصد موفقیت: <b>'+Math.round(total/120*100)+'%</b> | مدت: <b>'+durMin+' دقیقه و '+durSec+' ثانیه</b></p>' +
+    '<div class="row" style="justify-content:space-around;margin:12px 0;flex-wrap:wrap;text-align:center">' +
+      '<div><b>'+Object.keys(S.completed).filter(function(k){return S.completed[k];}).length+'/6</b><br><span class="small muted">مأموریت</span></div>' +
+      '<div><b>'+totalCorrect+'</b><br><span class="small muted">صحیح</span></div>' +
+      '<div><b>'+totalWrong+'</b><br><span class="small muted">نادرست</span></div>' +
+      '<div><b>'+totalTries+'</b><br><span class="small muted">تلاش</span></div>' +
+      '<div><b>'+totalHints+'</b><br><span class="small muted">راهنمایی</span></div>' +
+      '<div><b>'+S.badgeCount+'</b><br><span class="small muted">نشان</span></div>' +
+    '</div>' +
+    '<h3 style="color:var(--blue-d)">جدول عملکرد</h3>' +
+    '<div class="report-table"><table><thead><tr><th>مرحله</th><th>سؤال</th><th>صحیح</th><th>نادرست</th><th>درصد</th><th>تلاش</th><th>امتیاز</th><th>وضعیت</th></tr></thead><tbody>'+rows+'</tbody></table></div>' +
+    '<h3 style="color:var(--blue-d);margin-top:16px">تحلیل مهارت‌ها</h3>' + skillHTML +
+    '<h3 style="color:var(--blue-d);margin-top:16px">تحلیل آموزشی</h3>' +
+    '<p>🌟 <b>نقاط قوت:</b> '+(strengths.length?strengths.join('، '):'در حال شکل‌گیری')+'</p>' +
+    '<p>💪 <b>نیازمند تمرین:</b> '+(weaknesses.length?weaknesses.join('، '):'—')+'</p>' +
+    '<p>📘 <b>پیشنهاد:</b> '+(weaknesses.length?'روی «'+weaknesses[0]+'» بیشتر تمرین کن.':'با شکل‌های اطراف، خط تقارن پیدا کن.')+'</p>' +
+    '<p>💌 <b>پیام:</b> '+(total>=90?'عالی بودی! تسلط خوبی داری.':'هر تلاشی تو را قوی‌تر می‌کند.')+'</p>' +
+    '<p class="small muted" style="margin-top:12px">فاطمه جاشونیا</p>';
+  saveState();
+}
+document.getElementById('btnPrint').addEventListener('click', function(){ Sound.click(); window.print(); });
+document.getElementById('btnPdf').addEventListener('click', function(){ Sound.click(); window.print(); });
+document.getElementById('btnShowAnswers').addEventListener('click', function(){
+  Sound.click();
+  const items = S.answersLog.slice(-60).map(function(a){
+    return '<li class="small">'+a.stage+' | '+(a.ok?'✅':'❌')+' | '+(a.info||'')+'</li>';
+  }).join('');
+  openModal('<h3 style="color:var(--blue-d)">پاسخ‌ها</h3>' +
+    '<ul style="line-height:1.9;padding-right:18px;max-height:50vh;overflow:auto">'+(items||'<li>هنوز پاسخی ثبت نشده.</li>')+'</ul>' +
+    '<div class="row" style="justify-content:center;margin-top:10px"><button class="btn" id="closeModal">بستن</button></div>');
+});
+document.getElementById('btnRestart').addEventListener('click', function(){
+  if(confirm('آیا مطمئنی؟')){
+    Sound.click();
+    const name = {first: S.student.first, last: S.student.last};
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    S = defaultState(); S.student = name;
+    saveState(); show('screen-home');
+    document.getElementById('inpFirst').value = name.first||'';
+    updateTopbar();
+  }
+});
+document.getElementById('btnHomeFromReport').addEventListener('click', function(){ Sound.click(); goHome(); });
+
+/* INIT */
+(function(){
+  try{
+    BG.init();
+    BG.setStage('home');
+
+    updateTopbar();
+    if(S.student.first){
+      const fEl = document.getElementById('inpFirst'); if(fEl) fEl.value = S.student.first;
+    }
+    const map = {lesson:'screen-lesson', s1:'screen-s1', s2:'screen-s2', s3:'screen-s3', s4:'screen-s4', s5:'screen-s5', s6:'screen-s6', report:'screen-report'};
+    if(S.currentStage && S.currentStage !== 'home' && map[S.currentStage]){
+      show(map[S.currentStage]); updateTopbar();
+      if(S.currentStage==='lesson') initLesson();
+      else if(S.currentStage==='s1') initStage1();
+      else if(S.currentStage==='s2') initStage2();
+      else if(S.currentStage==='s3') initStage3();
+      else if(S.currentStage==='s4') initStage4();
+      else if(S.currentStage==='s5') initStage5();
+      else if(S.currentStage==='s6') initStage6();
+      else if(S.currentStage==='report') renderReport();
+    }
+    document.addEventListener('keydown', function(e){
+      if(e.key==='Enter' && document.activeElement === document.getElementById('inpFirst')){
+        e.preventDefault(); document.getElementById('btnStart').click();
+      }
+    });
+    document.addEventListener('pointerdown', function once(){
+      Sound.init();
+      if(Sound.musicOn) Sound.startMusic();
+      document.removeEventListener('pointerdown', once);
+    }, {once:true});
+  }catch(err){ console.error('init error:', err); }
+})();
+</script>
+</body>
+</html>
